@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { apiService, Filing } from '../services/api';
-import { FileText, Loader2, AlertCircle, ChevronDown, ChevronRight, Calendar, DollarSign, AlertTriangle, ExternalLink } from 'lucide-react';
+import { FileText, Loader2, AlertCircle, ChevronDown, ChevronRight, Calendar, IndianRupee, AlertTriangle, ExternalLink, CreditCard } from 'lucide-react';
 
 const AllFilings: React.FC = () => {
   const [filings, setFilings] = useState<Filing[]>([]);
@@ -38,6 +38,16 @@ const AllFilings: React.FC = () => {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
+    });
+  };
+
+  const formatDateTime = (dateString: string) => {
+    return new Date(dateString).toLocaleString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -145,12 +155,17 @@ const AllFilings: React.FC = () => {
                           <span>{formatDate(filing.filing_start_date)} - {formatDate(filing.filing_end_date)}</span>
                         </div>
                         <div className="flex items-center space-x-1">
-                          <DollarSign className="h-4 w-4" />
+                          <IndianRupee className="h-4 w-4" />
                           <span>{formatCurrency(filing.total_amount)}</span>
                         </div>
                         <span className="text-xs bg-gray-100 px-2 py-1 rounded capitalize">
                           {filing.timeframe}
                         </span>
+                        {filing.filed_at && (
+                          <div className="flex items-center space-x-1">
+                            <span className="text-xs">Filed: {formatDateTime(filing.filed_at)}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -164,23 +179,31 @@ const AllFilings: React.FC = () => {
               {isExpanded && (
                 <div className="border-t border-gray-200 bg-gray-50">
                   <div className="p-6 space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div className="bg-white p-4 rounded-lg">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
                         <div className="text-sm text-gray-500">Total Tax</div>
                         <div className="text-lg font-semibold text-gray-900">{formatCurrency(filing.total_tax)}</div>
                       </div>
-                      <div className="bg-white p-4 rounded-lg">
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
                         <div className="text-sm text-gray-500">Input Tax Credit</div>
-                        <div className="text-lg font-semibold text-gray-900">{formatCurrency(filing.input_tax_credit)}</div>
+                        <div className="text-lg font-semibold text-green-700">{formatCurrency(filing.input_tax_credit)}</div>
                       </div>
-                      <div className="bg-white p-4 rounded-lg">
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
                         <div className="text-sm text-gray-500">Tax Payable</div>
-                        <div className="text-lg font-semibold text-gray-900">{formatCurrency(filing.tax_payable)}</div>
+                        <div className="text-lg font-semibold text-orange-700">{formatCurrency(filing.tax_payable)}</div>
                       </div>
-                      <div className="bg-white p-4 rounded-lg">
-                        <div className="text-sm text-gray-500">Total Payable</div>
-                        <div className="text-lg font-semibold text-gray-900">{formatCurrency(filing.total_payable_amount)}</div>
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <div className="text-sm text-gray-500">Penalty</div>
+                        <div className="text-lg font-semibold text-red-700">{formatCurrency(filing.penalty)}</div>
                       </div>
+                    </div>
+
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <CreditCard className="h-5 w-5 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-800">Total Payable Amount</span>
+                      </div>
+                      <div className="text-2xl font-bold text-blue-900">{formatCurrency(filing.total_payable_amount)}</div>
                     </div>
 
                     <div>
@@ -192,6 +215,7 @@ const AllFilings: React.FC = () => {
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Invoice ID</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Buying Price</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">CGST</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">SGST</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">IGST</th>
@@ -203,7 +227,8 @@ const AllFilings: React.FC = () => {
                               <tr key={invoice.invoice_id} className="hover:bg-gray-50">
                                 <td className="px-4 py-3 text-sm font-medium text-gray-900">{invoice.invoice_id}</td>
                                 <td className="px-4 py-3 text-sm text-gray-600">{formatDate(invoice.date)}</td>
-                                <td className="px-4 py-3 text-sm text-gray-900">{formatCurrency(invoice.amount)}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
+                                <td className="px-4 py-3 text-sm text-gray-700">{formatCurrency(invoice.buying_price)}</td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{formatCurrency(invoice.cgst)}</td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{formatCurrency(invoice.sgst)}</td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{formatCurrency(invoice.igst)}</td>
