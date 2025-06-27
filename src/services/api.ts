@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://localhost:8080';
+// const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'https://gst-service-g776.onrender.com';
 
 export interface Vendor {
   gstin: string;
@@ -25,6 +26,7 @@ export interface Invoice {
 
 export interface Filing {
   gstin: string;
+  vendor_name: string;
   timeframe: string;
   filing_start_date: string;
   filing_end_date: string;

@@ -260,55 +260,62 @@ const GSTFilings: React.FC = () => {
                         <table className="min-w-full divide-y divide-gray-200">
                           <thead className="bg-gray-50">
                             <tr>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Invoice ID</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Invoice ID</th>
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Date</th>
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Buying Price</th>
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                                <div className="flex justify-center">
+
                                 <button
                                   onClick={() => sortInvoices(filingId, 'amount')}
                                   className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                                 >
-                                  <span>Amount</span>
+                                    <span>Amount </span>
                                   {getSortIcon(filingId, 'amount')}
                                 </button>
+                                </div>
                               </th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Buying Price</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">CGST</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">SGST</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">IGST</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">CGST</th>
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">SGST</th>
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">IGST</th>
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                                <div className="flex justify-center">
                                 <button
                                   onClick={() => sortInvoices(filingId, 'net_amount')}
                                   className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                                 >
-                                  <span>Net Amount</span>
+                                    <span>Net Amount </span>
                                   {getSortIcon(filingId, 'net_amount')}
                                 </button>
+                                </div>
                               </th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                                <div className="flex justify-center">
                                 <button
                                   onClick={() => sortInvoices(filingId, 'itc')}
                                   className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                                 >
-                                  <span>ITC</span>
+                                    <span>ITC </span>
                                   {getSortIcon(filingId, 'itc')}
                                 </button>
+                                </div>
                               </th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">State</th>
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">State</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-200">
                             {filing.invoices.map((invoice) => (
                               <tr key={invoice.invoice_id} className="hover:bg-gray-50">
-                                <td className="px-4 py-3 text-sm font-medium text-gray-900">{invoice.invoice_id}</td>
-                                <td className="px-4 py-3 text-sm text-gray-600">{formatDate(invoice.date)}</td>
-                                <td className="px-4 py-3 text-sm text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
-                                <td className="px-4 py-3 text-sm text-gray-700">{formatCurrency(invoice.buying_price)}</td>
-                                <td className="px-4 py-3 text-sm text-gray-900">{formatCurrency(invoice.cgst)}</td>
-                                <td className="px-4 py-3 text-sm text-gray-900">{formatCurrency(invoice.sgst)}</td>
-                                <td className="px-4 py-3 text-sm text-gray-900">{formatCurrency(invoice.igst)}</td>
-                                <td className="px-4 py-3 text-sm text-gray-900 font-medium">{formatCurrency(invoice.net_amount)}</td>
-                                <td className="px-4 py-3 text-sm text-gray-700">{formatCurrency(invoice.itc)}</td>
-                                <td className="px-4 py-3 text-sm text-gray-600">{invoice.state}</td>
+                                <td className="px-4 py-3 text-sm text-center font-medium text-gray-900">{invoice.invoice_id}</td>
+                                <td className="px-4 py-3 text-sm text-center text-gray-600">{formatDate(invoice.date)}</td>
+                                <td className="px-4 py-3 text-sm text-center text-gray-700">{formatCurrency(invoice.buying_price)}</td>
+                                <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
+                                <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.cgst)}</td>
+                                <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.sgst)}</td>
+                                <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.igst)}</td>
+                                <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.net_amount)}</td>
+                                <td className="px-4 py-3 text-sm text-center text-gray-700">{formatCurrency(invoice.itc)}</td>
+                                <td className="px-4 py-3 text-sm text-center text-gray-600">{invoice.state}</td>
                               </tr>
                             ))}
                           </tbody>
