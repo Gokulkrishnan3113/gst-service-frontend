@@ -16,7 +16,7 @@ const AllFilings: React.FC = () => {
         const data = await apiService.getAllFilings();
         setFilings(data);
       } catch (err) {
-        setError('Failed to fetch filings. Please try again.');
+        setError('No Filings found for this GSTIN.');
         console.error('Error fetching filings:', err);
       } finally {
         setLoading(false);
@@ -171,7 +171,7 @@ const AllFilings: React.FC = () => {
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-medium text-gray-900">{filing.invoice_count} Invoices</div>
-                    <div className="text-sm text-gray-600">Due: {formatDate(filing.due_date)}</div>
+                    <div className="text-sm text-gray-600">Invoice Due: {formatDate(filing.due_date)}</div>
                   </div>
                 </div>
               </div>
