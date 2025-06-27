@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { apiService, Filing } from '../services/api';
-import { FileText, Loader2, AlertCircle, ChevronDown, ChevronRight, Calendar, IndianRupee, AlertTriangle, CreditCard } from 'lucide-react';
+import { FileText, Loader2, AlertCircle, ChevronDown, ChevronRight, Calendar, IndianRupee, AlertTriangle, CreditCard, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 const GSTFilings: React.FC = () => {
   const { gstin } = useParams<{ gstin: string }>();
@@ -9,6 +9,7 @@ const GSTFilings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedFiling, setExpandedFiling] = useState<string | null>(null);
+  const [sortConfig, setSortConfig] = useState<{ [key: string]: 'asc' | 'desc' | null }>({});
 
   useEffect(() => {
     const fetchFilings = async () => {
@@ -71,6 +72,49 @@ const GSTFilings: React.FC = () => {
     }
   };
 
+  const sortInvoices = (filingId: string, field: string) => {
+    const currentSort = sortConfig[filingId];
+    let newSort: 'asc' | 'desc' = 'asc';
+
+    if (currentSort === 'asc') {
+      newSort = 'desc';
+    } else if (currentSort === 'desc') {
+      newSort = 'asc';
+    }
+
+    setSortConfig({ ...sortConfig, [filingId]: newSort });
+
+    setFilings(prevFilings =>
+      prevFilings.map(filing => {
+        if (`${filing.gstin}-${filings.indexOf(filing)}` === filingId) {
+          const sortedInvoices = [...filing.invoices].sort((a, b) => {
+            const aValue = parseFloat(a[field as keyof typeof a] as string);
+            const bValue = parseFloat(b[field as keyof typeof b] as string);
+
+            if (newSort === 'asc') {
+              return aValue - bValue;
+            } else {
+              return bValue - aValue;
+            }
+          });
+
+          return { ...filing, invoices: sortedInvoices };
+        }
+        return filing;
+      })
+    );
+  };
+
+  const getSortIcon = (filingId: string) => {
+    const currentSort = sortConfig[filingId];
+    if (currentSort === 'asc') {
+      return <ArrowUp className="h-4 w-4" />;
+    } else if (currentSort === 'desc') {
+      return <ArrowDown className="h-4 w-4" />;
+    }
+    return <ArrowUpDown className="h-4 w-4" />;
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -94,6 +138,20 @@ const GSTFilings: React.FC = () => {
           >
             Try Again
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (filings.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="flex flex-col items-center space-y-4 text-center">
+          <FileText className="h-12 w-12 text-gray-400" />
+          <div>
+            <h3 className="text-lg font-medium text-gray-900">No filings found</h3>
+            <p className="text-gray-600">No GST filings exist for GSTIN: {gstin}</p>
+          </div>
         </div>
       </div>
     );
@@ -204,11 +262,21 @@ const GSTFilings: React.FC = () => {
                             <tr>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Invoice ID</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                <button
+                                  onClick={() => sortInvoices(filingId, 'amount')}
+                                  className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                                >
+                                  <span>Amount</span>
+                                  {getSortIcon(filingId)}
+                                </button>
+                              </th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Buying Price</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">CGST</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">SGST</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">IGST</th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Net Amount</th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ITC</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">State</th>
                             </tr>
                           </thead>
@@ -222,6 +290,8 @@ const GSTFilings: React.FC = () => {
                                 <td className="px-4 py-3 text-sm text-gray-900">{formatCurrency(invoice.cgst)}</td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{formatCurrency(invoice.sgst)}</td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{formatCurrency(invoice.igst)}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900 font-medium">{formatCurrency(invoice.net_amount)}</td>
+                                <td className="px-4 py-3 text-sm text-gray-700">{formatCurrency(invoice.itc)}</td>
                                 <td className="px-4 py-3 text-sm text-gray-600">{invoice.state}</td>
                               </tr>
                             ))}

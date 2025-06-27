@@ -19,6 +19,8 @@ export interface Invoice {
   sgst: string;
   igst: string;
   state: string;
+  net_amount: string;
+  itc: string;
 }
 
 export interface Filing {
