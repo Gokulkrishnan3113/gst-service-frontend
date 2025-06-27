@@ -73,7 +73,7 @@ const GSTFilings: React.FC = () => {
   };
 
   const sortInvoices = (filingId: string, field: string) => {
-    const currentSort = sortConfig[filingId];
+    const currentSort = sortConfig[`${filingId}-${field}`];
     let newSort: 'asc' | 'desc' = 'asc';
 
     if (currentSort === 'asc') {
@@ -82,7 +82,7 @@ const GSTFilings: React.FC = () => {
       newSort = 'asc';
     }
 
-    setSortConfig({ ...sortConfig, [filingId]: newSort });
+    setSortConfig({ ...sortConfig, [`${filingId}-${field}`]: newSort });
 
     setFilings(prevFilings =>
       prevFilings.map(filing => {
@@ -105,8 +105,8 @@ const GSTFilings: React.FC = () => {
     );
   };
 
-  const getSortIcon = (filingId: string) => {
-    const currentSort = sortConfig[filingId];
+  const getSortIcon = (filingId: string, field: string) => {
+    const currentSort = sortConfig[`${filingId}-${field}`];
     if (currentSort === 'asc') {
       return <ArrowUp className="h-4 w-4" />;
     } else if (currentSort === 'desc') {
@@ -268,15 +268,31 @@ const GSTFilings: React.FC = () => {
                                   className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                                 >
                                   <span>Amount</span>
-                                  {getSortIcon(filingId)}
+                                  {getSortIcon(filingId, 'amount')}
                                 </button>
                               </th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Buying Price</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">CGST</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">SGST</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">IGST</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Net Amount</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ITC</th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                <button
+                                  onClick={() => sortInvoices(filingId, 'net_amount')}
+                                  className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                                >
+                                  <span>Net Amount</span>
+                                  {getSortIcon(filingId, 'net_amount')}
+                                </button>
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                <button
+                                  onClick={() => sortInvoices(filingId, 'itc')}
+                                  className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                                >
+                                  <span>ITC</span>
+                                  {getSortIcon(filingId, 'itc')}
+                                </button>
+                              </th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">State</th>
                             </tr>
                           </thead>
