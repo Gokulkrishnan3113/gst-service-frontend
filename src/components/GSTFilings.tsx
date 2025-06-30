@@ -304,20 +304,58 @@ const GSTFilings: React.FC = () => {
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-200">
-                            {filing.invoices.map((invoice) => (
-                              <tr key={invoice.invoice_id} className="hover:bg-gray-50">
-                                <td className="px-4 py-3 text-sm text-center font-medium text-gray-900">{invoice.invoice_id}</td>
-                                <td className="px-4 py-3 text-sm text-center text-gray-600">{formatDate(invoice.date)}</td>
-                                <td className="px-4 py-3 text-sm text-center text-gray-700">{formatCurrency(invoice.buying_price)}</td>
-                                <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
-                                <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.cgst)}</td>
-                                <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.sgst)}</td>
-                                <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.igst)}</td>
-                                <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.net_amount)}</td>
-                                <td className="px-4 py-3 text-sm text-center text-gray-700">{formatCurrency(invoice.itc)}</td>
-                                <td className="px-4 py-3 text-sm text-center text-gray-600">{invoice.state}</td>
-                              </tr>
-                            ))}
+                            {(() => {
+                              const totals = {
+                                buying_price: 0,
+                                amount: 0,
+                                cgst: 0,
+                                sgst: 0,
+                                igst: 0,
+                                net_amount: 0,
+                                itc: 0,
+                              };
+
+                              filing.invoices.forEach((invoice) => {
+                                totals.buying_price += parseFloat(invoice.buying_price);
+                                totals.amount += parseFloat(invoice.amount);
+                                totals.cgst += parseFloat(invoice.cgst);
+                                totals.sgst += parseFloat(invoice.sgst);
+                                totals.igst += parseFloat(invoice.igst);
+                                totals.net_amount += parseFloat(invoice.net_amount);
+                                totals.itc += parseFloat(invoice.itc);
+                              });
+
+                              return (
+                                <>
+                                  {filing.invoices.map((invoice) => (
+                                    <tr key={invoice.invoice_id} className="hover:bg-gray-50">
+                                      <td className="px-4 py-3 text-sm text-center font-medium text-gray-900">{invoice.invoice_id}</td>
+                                      <td className="px-4 py-3 text-sm text-center text-gray-600">{formatDate(invoice.date)}</td>
+                                      <td className="px-4 py-3 text-sm text-center text-gray-700">{formatCurrency(invoice.buying_price)}</td>
+                                      <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
+                                      <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.cgst)}</td>
+                                      <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.sgst)}</td>
+                                      <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.igst)}</td>
+                                      <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.net_amount)}</td>
+                                      <td className="px-4 py-3 text-sm text-center text-gray-700">{formatCurrency(invoice.itc)}</td>
+                                      <td className="px-4 py-3 text-sm text-center text-gray-600">{invoice.state}</td>
+                                    </tr>
+                                  ))}
+                                  <tr className="bg-blue-50 font-semibold text-blue-900">
+                                    <td colSpan={1} className="px-4 py-3 text-sm text-center">Total</td>
+                                    <td className="px-4 py-3 text-sm text-center">-</td>
+                                    <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.buying_price.toFixed(2))}</td>
+                                    <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.amount.toFixed(2))}</td>
+                                    <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.cgst.toFixed(2))}</td>
+                                    <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.sgst.toFixed(2))}</td>
+                                    <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.igst.toFixed(2))}</td>
+                                    <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.net_amount.toFixed(2))}</td>
+                                    <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.itc.toFixed(2))}</td>
+                                    <td className="px-4 py-3 text-sm text-center">-</td>
+                                  </tr>
+                                </>
+                              );
+                            })()}
                           </tbody>
                         </table>
                       </div>

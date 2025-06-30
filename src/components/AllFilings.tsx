@@ -34,6 +34,30 @@ const AllFilings: React.FC = () => {
     }).format(parseFloat(amount));
   };
 
+  const calculateInvoiceTotals = (invoices: Filing['invoices']) => {
+  let totals = {
+    buying_price: 0,
+    amount: 0,
+    cgst: 0,
+    sgst: 0,
+    igst: 0,
+    net_amount: 0,
+    itc: 0,
+  };
+
+  invoices.forEach((invoice) => {
+    totals.buying_price += parseFloat(invoice.buying_price);
+    totals.amount += parseFloat(invoice.amount);
+    totals.cgst += parseFloat(invoice.cgst);
+    totals.sgst += parseFloat(invoice.sgst);
+    totals.igst += parseFloat(invoice.igst);
+    totals.net_amount += parseFloat(invoice.net_amount);
+    totals.itc += parseFloat(invoice.itc);
+  });
+
+    return totals;
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
       year: 'numeric',
@@ -336,6 +360,23 @@ const AllFilings: React.FC = () => {
                                 <td className="px-4 py-3 text-sm text-center text-gray-600">{invoice.state}</td>
                               </tr>
                             ))}
+                            {(() => {
+                              const totals = calculateInvoiceTotals(filing.invoices);
+                              return (
+                                <tr className="bg-blue-100 font-semibold text-gray-800">
+                                  <td className="px-4 py-3 text-sm text-center" colSpan={1}>Total</td>
+                                  <td className="px-4 py-3 text-sm text-center">--</td>
+                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.buying_price.toFixed(2))}</td>
+                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.amount.toFixed(2))}</td>
+                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.cgst.toFixed(2))}</td>
+                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.sgst.toFixed(2))}</td>
+                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.igst.toFixed(2))}</td>
+                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.net_amount.toFixed(2))}</td>
+                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.itc.toFixed(2))}</td>
+                                  <td className="px-4 py-3 text-sm text-center">--</td>
+                                </tr>
+                              );
+                            })()}
                           </tbody>
                         </table>
                       </div>
