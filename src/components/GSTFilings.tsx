@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { apiService, Filing } from '../services/api';
-import { FileText, Loader2, AlertCircle, ChevronDown, ChevronRight, Calendar, IndianRupee, AlertTriangle, CreditCard, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { FileText, Loader2, AlertCircle, ChevronDown, ChevronRight, Calendar, IndianRupee, AlertTriangle, CreditCard, ArrowUpDown, ArrowUp, ArrowDown, Package } from 'lucide-react';
 
 const GSTFilings: React.FC = () => {
   const { gstin } = useParams<{ gstin: string }>();
@@ -9,6 +9,7 @@ const GSTFilings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedFiling, setExpandedFiling] = useState<string | null>(null);
+  const [expandedInvoice, setExpandedInvoice] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{ [key: string]: 'asc' | 'desc' | null }>({});
 
   useEffect(() => {
@@ -57,6 +58,15 @@ const GSTFilings: React.FC = () => {
 
   const toggleExpanded = (filingId: string) => {
     setExpandedFiling(expandedFiling === filingId ? null : filingId);
+    // Close any expanded invoices when collapsing filing
+    if (expandedFiling === filingId) {
+      setExpandedInvoice(null);
+    }
+  };
+
+  const toggleInvoiceExpanded = (invoiceId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpandedInvoice(expandedInvoice === invoiceId ? null : invoiceId);
   };
 
   const getStatusColor = (status: string) => {
@@ -324,19 +334,84 @@ const GSTFilings: React.FC = () => {
 
                               return (
                                 <>
-                                  {filing.invoices.map((invoice) => (
-                                    <tr key={invoice.invoice_id} className="hover:bg-gray-50">
-                                      <td className="px-4 py-3 text-sm text-center font-medium text-gray-900">{invoice.invoice_id}</td>
-                                      <td className="px-4 py-3 text-sm text-center text-gray-600">{formatDate(invoice.date)}</td>
-                                      <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
-                                      <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.cgst)}</td>
-                                      <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.sgst)}</td>
-                                      <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.igst)}</td>
-                                      <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.net_amount)}</td>
-                                      <td className="px-4 py-3 text-sm text-center text-gray-700">{formatCurrency(invoice.itc)}</td>
-                                      <td className="px-4 py-3 text-sm text-center text-gray-600">{invoice.state}</td>
-                                    </tr>
-                                  ))}
+                                  {filing.invoices.map((invoice) => {
+                                    const invoiceId = `${filingId}-${invoice.invoice_id}`;
+                                    const isInvoiceExpanded = expandedInvoice === invoiceId;
+
+                                    return (
+                                      <React.Fragment key={invoice.invoice_id}>
+                                        <tr
+                                          className="hover:bg-gray-50 cursor-pointer"
+                                          onClick={(e) => toggleInvoiceExpanded(invoiceId, e)}
+                                        >
+                                          <td className="px-4 py-3 text-sm text-center font-medium text-gray-900">
+                                            <div className="flex items-center justify-center space-x-2">
+                                              {isInvoiceExpanded ? (
+                                                <ChevronDown className="h-4 w-4 text-gray-400" />
+                                              ) : (
+                                                <ChevronRight className="h-4 w-4 text-gray-400" />
+                                              )}
+                                              <span>{invoice.invoice_id}</span>
+                                            </div>
+                                          </td>
+                                          <td className="px-4 py-3 text-sm text-center text-gray-600">{formatDate(invoice.date)}</td>
+                                          <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
+                                          <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.cgst)}</td>
+                                          <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.sgst)}</td>
+                                          <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.igst)}</td>
+                                          <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.net_amount)}</td>
+                                          <td className="px-4 py-3 text-sm text-center text-gray-700">{formatCurrency(invoice.itc)}</td>
+                                          <td className="px-4 py-3 text-sm text-center text-gray-600">{invoice.state}</td>
+                                        </tr>
+                                        {isInvoiceExpanded && (
+                                          <tr>
+                                            <td colSpan={9} className="px-4 py-0">
+                                              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-2">
+                                                <div className="flex items-center space-x-2 mb-3">
+                                                  <Package className="h-5 w-5 text-blue-600" />
+                                                  <h5 className="text-sm font-semibold text-blue-800">Product Details</h5>
+                                                </div>
+                                                <div className="overflow-x-auto">
+                                                  <table className="min-w-full divide-y divide-blue-200">
+                                                    <thead className="bg-blue-100">
+                                                      <tr>
+                                                        <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">SKU</th>
+                                                        <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Product Name</th>
+                                                        <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Category</th>
+                                                        <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Unit Price</th>
+                                                        <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Quantity</th>
+                                                        <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Discount %</th>
+                                                        <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Price After Discount</th>
+                                                        <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Buying Price</th>
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-blue-200">
+                                                      {invoice.products && invoice.products.map((product, productIndex) => (
+                                                        <tr key={productIndex} className="bg-white">
+                                                          <td className="px-3 py-2 text-center text-xs font-medium text-gray-900">{product.sku}</td>
+                                                          <td className="px-3 py-2 text-center text-xs text-gray-900">{product.product_name}</td>
+                                                          <td className="px-3 py-2 text-center text-xs text-gray-600">
+                                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                              {product.category}
+                                                            </span>
+                                                          </td>
+                                                          <td className="px-3 py-2 text-center text-xs text-gray-900">{formatCurrency(product.unit_price)}</td>
+                                                          <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{product.quantity}</td>
+                                                          <td className="px-3 py-2 text-center text-xs text-gray-900">{product.discount_percent}%</td>
+                                                          <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.price_after_discount)}</td>
+                                                          <td className="px-3 py-2 text-center text-xs text-gray-700">{formatCurrency(product.buying_price)}</td>
+                                                        </tr>
+                                                      ))}
+                                                    </tbody>
+                                                  </table>
+                                                </div>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        )}
+                                      </React.Fragment>
+                                    );
+                                  })}
                                   <tr className="bg-blue-50 font-semibold text-blue-900">
                                     <td colSpan={1} className="px-4 py-3 text-sm text-center">Total</td>
                                     <td className="px-4 py-3 text-sm text-center">-</td>
