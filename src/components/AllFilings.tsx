@@ -35,8 +35,7 @@ const AllFilings: React.FC = () => {
   };
 
   const calculateInvoiceTotals = (invoices: Filing['invoices']) => {
-  let totals = {
-    buying_price: 0,
+    const totals = {
     amount: 0,
     cgst: 0,
     sgst: 0,
@@ -45,8 +44,7 @@ const AllFilings: React.FC = () => {
     itc: 0,
   };
 
-  invoices.forEach((invoice) => {
-    totals.buying_price += parseFloat(invoice.buying_price);
+    invoices.forEach((invoice) => {
     totals.amount += parseFloat(invoice.amount);
     totals.cgst += parseFloat(invoice.cgst);
     totals.sgst += parseFloat(invoice.sgst);
@@ -304,7 +302,6 @@ const AllFilings: React.FC = () => {
                             <tr>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Invoice ID</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Date</th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Buying Price</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                                 <div className="flex justify-center">
                                   <button
@@ -350,7 +347,6 @@ const AllFilings: React.FC = () => {
                               <tr key={invoice.invoice_id} className="hover:bg-gray-50">
                                 <td className="px-4 py-3 text-sm text-center font-medium text-gray-900">{invoice.invoice_id}</td>
                                 <td className="px-4 py-3 text-sm text-center text-gray-600">{formatDate(invoice.date)}</td>
-                                <td className="px-4 py-3 text-sm text-center text-gray-700">{formatCurrency(invoice.buying_price)}</td>
                                 <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
                                 <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.cgst)}</td>
                                 <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.sgst)}</td>
@@ -366,7 +362,6 @@ const AllFilings: React.FC = () => {
                                 <tr className="bg-blue-100 font-semibold text-gray-800">
                                   <td className="px-4 py-3 text-sm text-center" colSpan={1}>Total</td>
                                   <td className="px-4 py-3 text-sm text-center">--</td>
-                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.buying_price.toFixed(2))}</td>
                                   <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.amount.toFixed(2))}</td>
                                   <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.cgst.toFixed(2))}</td>
                                   <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.sgst.toFixed(2))}</td>

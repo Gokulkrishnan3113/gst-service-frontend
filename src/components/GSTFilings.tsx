@@ -262,7 +262,6 @@ const GSTFilings: React.FC = () => {
                             <tr>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Invoice ID</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Date</th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Buying Price</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                                 <div className="flex justify-center">
 
@@ -306,7 +305,6 @@ const GSTFilings: React.FC = () => {
                           <tbody className="divide-y divide-gray-200">
                             {(() => {
                               const totals = {
-                                buying_price: 0,
                                 amount: 0,
                                 cgst: 0,
                                 sgst: 0,
@@ -316,7 +314,6 @@ const GSTFilings: React.FC = () => {
                               };
 
                               filing.invoices.forEach((invoice) => {
-                                totals.buying_price += parseFloat(invoice.buying_price);
                                 totals.amount += parseFloat(invoice.amount);
                                 totals.cgst += parseFloat(invoice.cgst);
                                 totals.sgst += parseFloat(invoice.sgst);
@@ -331,7 +328,6 @@ const GSTFilings: React.FC = () => {
                                     <tr key={invoice.invoice_id} className="hover:bg-gray-50">
                                       <td className="px-4 py-3 text-sm text-center font-medium text-gray-900">{invoice.invoice_id}</td>
                                       <td className="px-4 py-3 text-sm text-center text-gray-600">{formatDate(invoice.date)}</td>
-                                      <td className="px-4 py-3 text-sm text-center text-gray-700">{formatCurrency(invoice.buying_price)}</td>
                                       <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
                                       <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.cgst)}</td>
                                       <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.sgst)}</td>
@@ -344,7 +340,6 @@ const GSTFilings: React.FC = () => {
                                   <tr className="bg-blue-50 font-semibold text-blue-900">
                                     <td colSpan={1} className="px-4 py-3 text-sm text-center">Total</td>
                                     <td className="px-4 py-3 text-sm text-center">-</td>
-                                    <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.buying_price.toFixed(2))}</td>
                                     <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.amount.toFixed(2))}</td>
                                     <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.cgst.toFixed(2))}</td>
                                     <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.sgst.toFixed(2))}</td>
