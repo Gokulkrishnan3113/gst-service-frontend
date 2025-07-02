@@ -8,7 +8,7 @@ const AllFilings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedFiling, setExpandedFiling] = useState<string | null>(null);
-  const [expandedInvoice, setExpandedInvoice] = useState<string | null>(null);
+  const [expandedInvoices, setExpandedInvoices] = useState<Set<string>>(new Set());
   const [sortConfig, setSortConfig] = useState<{ [key: string]: 'asc' | 'desc' | null }>({});
 
   useEffect(() => {
@@ -79,13 +79,21 @@ const AllFilings: React.FC = () => {
     setExpandedFiling(expandedFiling === filingId ? null : filingId);
     // Close any expanded invoices when collapsing filing
     if (expandedFiling === filingId) {
-      setExpandedInvoice(null);
+      setExpandedInvoices(new Set());
     }
   };
 
   const toggleInvoiceExpanded = (invoiceId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setExpandedInvoice(expandedInvoice === invoiceId ? null : invoiceId);
+    setExpandedInvoices(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(invoiceId)) {
+        newSet.delete(invoiceId);
+      } else {
+        newSet.add(invoiceId);
+      }
+      return newSet;
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -356,7 +364,7 @@ const AllFilings: React.FC = () => {
                           <tbody className="divide-y divide-gray-200">
                             {filing.invoices.map((invoice) => {
                               const invoiceId = `${filingId}-${invoice.invoice_id}`;
-                              const isInvoiceExpanded = expandedInvoice === invoiceId;
+                              const isInvoiceExpanded = expandedInvoices.has(invoiceId);
 
                               return (
                                 <React.Fragment key={invoice.invoice_id}>
@@ -407,7 +415,7 @@ const AllFilings: React.FC = () => {
                                                 </tr>
                                               </thead>
                                               <tbody className="divide-y divide-blue-200">
-                                                {invoice.products && invoice.products.map((product, productIndex) => (
+                                                {invoice.products.map((product, productIndex) => (
                                                   <tr key={productIndex} className="bg-white">
                                                     <td className="px-3 py-2 text-xs font-medium text-gray-900">{product.sku}</td>
                                                     <td className="px-3 py-2 text-xs text-gray-900">{product.product_name}</td>

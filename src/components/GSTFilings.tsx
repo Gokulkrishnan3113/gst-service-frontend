@@ -9,13 +9,13 @@ const GSTFilings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedFiling, setExpandedFiling] = useState<string | null>(null);
-  const [expandedInvoice, setExpandedInvoice] = useState<string | null>(null);
+  const [expandedInvoices, setExpandedInvoices] = useState<Set<string>>(new Set());
   const [sortConfig, setSortConfig] = useState<{ [key: string]: 'asc' | 'desc' | null }>({});
 
   useEffect(() => {
     const fetchFilings = async () => {
       if (!gstin) return;
-      
+
       try {
         setLoading(true);
         const data = await apiService.getFilingsByGstin(gstin);
@@ -60,13 +60,21 @@ const GSTFilings: React.FC = () => {
     setExpandedFiling(expandedFiling === filingId ? null : filingId);
     // Close any expanded invoices when collapsing filing
     if (expandedFiling === filingId) {
-      setExpandedInvoice(null);
+      setExpandedInvoices(new Set());
     }
   };
 
   const toggleInvoiceExpanded = (invoiceId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setExpandedInvoice(expandedInvoice === invoiceId ? null : invoiceId);
+    setExpandedInvoices(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(invoiceId)) {
+        newSet.delete(invoiceId);
+      } else {
+        newSet.add(invoiceId);
+      }
+      return newSet;
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -181,7 +189,7 @@ const GSTFilings: React.FC = () => {
         {filings.map((filing, index) => {
           const filingId = `${filing.gstin}-${index}`;
           const isExpanded = expandedFiling === filingId;
-          
+
           return (
             <div key={filingId} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               <div
@@ -275,13 +283,13 @@ const GSTFilings: React.FC = () => {
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                                 <div className="flex justify-center">
 
-                                <button
-                                  onClick={() => sortInvoices(filingId, 'amount')}
-                                  className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
-                                >
+                                  <button
+                                    onClick={() => sortInvoices(filingId, 'amount')}
+                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                                  >
                                     <span>Amount </span>
-                                  {getSortIcon(filingId, 'amount')}
-                                </button>
+                                    {getSortIcon(filingId, 'amount')}
+                                  </button>
                                 </div>
                               </th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">CGST</th>
@@ -289,24 +297,24 @@ const GSTFilings: React.FC = () => {
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">IGST</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                                 <div className="flex justify-center">
-                                <button
-                                  onClick={() => sortInvoices(filingId, 'net_amount')}
-                                  className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
-                                >
+                                  <button
+                                    onClick={() => sortInvoices(filingId, 'net_amount')}
+                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                                  >
                                     <span>Net Amount </span>
-                                  {getSortIcon(filingId, 'net_amount')}
-                                </button>
+                                    {getSortIcon(filingId, 'net_amount')}
+                                  </button>
                                 </div>
                               </th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                                 <div className="flex justify-center">
-                                <button
-                                  onClick={() => sortInvoices(filingId, 'itc')}
-                                  className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
-                                >
+                                  <button
+                                    onClick={() => sortInvoices(filingId, 'itc')}
+                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                                  >
                                     <span>ITC </span>
-                                  {getSortIcon(filingId, 'itc')}
-                                </button>
+                                    {getSortIcon(filingId, 'itc')}
+                                  </button>
                                 </div>
                               </th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">State</th>
@@ -336,7 +344,7 @@ const GSTFilings: React.FC = () => {
                                 <>
                                   {filing.invoices.map((invoice) => {
                                     const invoiceId = `${filingId}-${invoice.invoice_id}`;
-                                    const isInvoiceExpanded = expandedInvoice === invoiceId;
+                                    const isInvoiceExpanded = expandedInvoices.has(invoiceId);
 
                                     return (
                                       <React.Fragment key={invoice.invoice_id}>
