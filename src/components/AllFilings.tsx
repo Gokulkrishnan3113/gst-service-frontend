@@ -43,6 +43,8 @@ const AllFilings: React.FC = () => {
       igst: 0,
       net_amount: 0,
       itc: 0,
+      productcount: 0,
+      buying_price: 0,
     };
 
     invoices.forEach((invoice) => {
@@ -52,6 +54,8 @@ const AllFilings: React.FC = () => {
       totals.igst += parseFloat(invoice.igst);
       totals.net_amount += parseFloat(invoice.net_amount);
       totals.itc += parseFloat(invoice.itc);
+      totals.productcount += invoice.products.length;
+      totals.buying_price += parseFloat(invoice.buying_price);
     });
 
     return totals;
@@ -320,18 +324,19 @@ const AllFilings: React.FC = () => {
                             <tr>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Invoice ID</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Date</th>
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">No. of products</th>
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Buying Price</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                                 <div className="flex justify-center">
                                   <button
                                     onClick={() => sortInvoices(filingId, 'amount')}
                                     className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                                   >
-                                    <span>Amount </span>
+                                    <span>AMOUNT </span>
                                     {getSortIcon(filingId, 'amount')}
                                   </button>
                                 </div>
                               </th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Buying Price</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">CGST</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">SGST</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">IGST</th>
@@ -341,7 +346,7 @@ const AllFilings: React.FC = () => {
                                     onClick={() => sortInvoices(filingId, 'net_amount')}
                                     className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                                   >
-                                    <span>Net Amount </span>
+                                    <span>NET AMOUNT </span>
                                     {getSortIcon(filingId, 'net_amount')}
                                   </button>
                                 </div>
@@ -383,8 +388,9 @@ const AllFilings: React.FC = () => {
                                       </div>
                                     </td>
                                     <td className="px-4 py-3 text-sm text-center text-gray-600">{formatDate(invoice.date)}</td>
-                                    <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
+                                    <td className="px-4 py-3 text-sm text-center text-gray-600">{invoice.products.length}</td>
                                     <td className="px-4 py-3 text-sm text-center text-gray-700">{formatCurrency(invoice.buying_price)}</td>
+                                    <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
                                     <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.cgst)}</td>
                                     <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.sgst)}</td>
                                     <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.igst)}</td>
@@ -394,7 +400,7 @@ const AllFilings: React.FC = () => {
                                   </tr>
                                   {isInvoiceExpanded && (
                                     <tr>
-                                      <td colSpan={10} className="px-4 py-0">
+                                      <td colSpan={12} className="px-4 py-0">
                                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-2">
                                           <div className="flex items-center space-x-2 mb-3">
                                             <Package className="h-5 w-5 text-blue-600" />
@@ -454,8 +460,9 @@ const AllFilings: React.FC = () => {
                                 <tr className="bg-blue-100 font-semibold text-gray-800">
                                   <td className="px-4 py-3 text-sm text-center" colSpan={1}>Total</td>
                                   <td className="px-4 py-3 text-sm text-center">--</td>
+                                  <td className="px-4 py-3 text-sm text-center">{totals.productcount}</td>
+                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.buying_price.toFixed(2))}</td>
                                   <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.amount.toFixed(2))}</td>
-                                  <td className="px-4 py-3 text-sm text-center">--</td>
                                   <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.cgst.toFixed(2))}</td>
                                   <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.sgst.toFixed(2))}</td>
                                   <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.igst.toFixed(2))}</td>
