@@ -404,31 +404,38 @@ const AllFilings: React.FC = () => {
                                             <table className="min-w-full divide-y divide-blue-200">
                                               <thead className="bg-blue-100">
                                                 <tr>
-                                                  <th className="px-3 py-2 text-left text-xs font-medium text-blue-700 uppercase">SKU</th>
-                                                  <th className="px-3 py-2 text-left text-xs font-medium text-blue-700 uppercase">Product Name</th>
-                                                  <th className="px-3 py-2 text-left text-xs font-medium text-blue-700 uppercase">Category</th>
-                                                  <th className="px-3 py-2 text-left text-xs font-medium text-blue-700 uppercase">Unit Price</th>
-                                                  <th className="px-3 py-2 text-left text-xs font-medium text-blue-700 uppercase">Quantity</th>
-                                                  <th className="px-3 py-2 text-left text-xs font-medium text-blue-700 uppercase">Discount %</th>
-                                                  <th className="px-3 py-2 text-left text-xs font-medium text-blue-700 uppercase">Price After Discount</th>
-                                                  <th className="px-3 py-2 text-left text-xs font-medium text-blue-700 uppercase">Buying Price</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">SKU</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Product Name</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Category</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Buying Price</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Unit Price</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Quantity</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Discount %</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Price After Discount</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">CGST</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">SGST</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">IGST</th>
                                                 </tr>
                                               </thead>
                                               <tbody className="divide-y divide-blue-200">
                                                 {invoice.products.map((product, productIndex) => (
+                                                  console.log(product),
                                                   <tr key={productIndex} className="bg-white">
-                                                    <td className="px-3 py-2 text-xs font-medium text-gray-900">{product.sku}</td>
-                                                    <td className="px-3 py-2 text-xs text-gray-900">{product.product_name}</td>
-                                                    <td className="px-3 py-2 text-xs text-gray-600">
+                                                    <td className="px-3 py-2 text-center text-xs font-medium text-gray-900">{product.sku}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900">{product.product_name}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-600">
                                                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                                         {product.category}
                                                       </span>
                                                     </td>
-                                                    <td className="px-3 py-2 text-xs text-gray-900">{formatCurrency(product.unit_price)}</td>
-                                                    <td className="px-3 py-2 text-xs text-gray-900 font-medium">{product.quantity}</td>
-                                                    <td className="px-3 py-2 text-xs text-gray-900">{product.discount_percent}%</td>
-                                                    <td className="px-3 py-2 text-xs text-gray-900 font-medium">{formatCurrency(product.price_after_discount)}</td>
-                                                    <td className="px-3 py-2 text-xs text-gray-700">{formatCurrency(product.buying_price)}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-700">{formatCurrency(product.buying_price)}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900">{formatCurrency(product.unit_price)}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{product.quantity}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900">{product.discount_percent}%</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.price_after_discount)}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.cgst)}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.sgst)}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.igst)}</td>
                                                   </tr>
                                                 ))}
                                               </tbody>

@@ -386,11 +386,14 @@ const GSTFilings: React.FC = () => {
                                                         <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">SKU</th>
                                                         <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Product Name</th>
                                                         <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Category</th>
+                                                        <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Buying Price</th>
                                                         <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Unit Price</th>
                                                         <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Quantity</th>
                                                         <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Discount %</th>
                                                         <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Price After Discount</th>
-                                                        <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Buying Price</th>
+                                                        <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">CGST</th>
+                                                        <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">SGST</th>
+                                                        <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">IGST</th>
                                                       </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-blue-200">
@@ -403,11 +406,14 @@ const GSTFilings: React.FC = () => {
                                                               {product.category}
                                                             </span>
                                                           </td>
+                                                          <td className="px-3 py-2 text-center text-xs text-gray-700">{formatCurrency(product.buying_price)}</td>
                                                           <td className="px-3 py-2 text-center text-xs text-gray-900">{formatCurrency(product.unit_price)}</td>
                                                           <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{product.quantity}</td>
                                                           <td className="px-3 py-2 text-center text-xs text-gray-900">{product.discount_percent}%</td>
                                                           <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.price_after_discount)}</td>
-                                                          <td className="px-3 py-2 text-center text-xs text-gray-700">{formatCurrency(product.buying_price)}</td>
+                                                          <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.cgst)}</td>
+                                                          <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.sgst)}</td>
+                                                          <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.igst)}</td>
                                                         </tr>
                                                       ))}
                                                     </tbody>

@@ -19,7 +19,9 @@ export interface Product {
   quantity: number;
   discount_percent: string;
   price_after_discount: string;
-  tax: Record<string, number>;
+  cgst: string;
+  sgst: string;
+  igst: string;
   buying_price: string;
 }
 
