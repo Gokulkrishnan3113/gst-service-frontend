@@ -11,6 +11,20 @@ export interface Vendor {
   turnover: string;
 }
 
+export interface Product {
+  sku: string;
+  product_name: string;
+  category: string;
+  unit_price: string;
+  quantity: number;
+  discount_percent: string;
+  price_after_discount: string;
+  cgst: string;
+  sgst: string;
+  igst: string;
+  buying_price: string;
+}
+
 export interface Invoice {
   invoice_id: string;
   date: string;
@@ -22,6 +36,7 @@ export interface Invoice {
   state: string;
   net_amount: string;
   itc: string;
+  products: Product[];
 }
 
 export interface Filing {
