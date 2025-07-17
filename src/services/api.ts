@@ -137,18 +137,22 @@ export const apiService = {
   async getBalance(gstin: string): Promise<Balance> {
     const response = await fetch(`${API_BASE_URL}/balance/${gstin}`);
     if (!response.ok) {
-      throw new Error('Failed to fetch balance');
+      throw new Error(`Failed to fetch balance: ${response.status}`);
     }
     const result: ApiResponse<Balance> = await response.json();
+    console.log('Balance API response:', result); // Debug log
     return result.data;
   },
 
   async getCreditNotes(gstin: string): Promise<CreditNote[]> {
     const response = await fetch(`${API_BASE_URL}/credit-notes/${gstin}`);
     if (!response.ok) {
-      throw new Error('Failed to fetch credit notes');
+      throw new Error(`Failed to fetch ledger: ${response.status}`);
     }
     const result: ApiResponse<CreditNote[]> = await response.json();
+    console.log('Credit Notes API response:', result); // Debug log
+    console.log('Ledger API response:', result); // Debug log
     return result.data;
   },
 };
+      throw new Error(`Failed to fetch credit notes: ${response.status}`);

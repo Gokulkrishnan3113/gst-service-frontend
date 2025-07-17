@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiService, Vendor } from '../services/api';
-import { Users, Loader2, AlertCircle, Search, DollarSign } from 'lucide-react';
+import { Users, Loader2, AlertCircle, Search, IndianRupee } from 'lucide-react';
 
 const VendorSelector: React.FC = () => {
   const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -67,7 +67,7 @@ const VendorSelector: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-3">
-        <DollarSign className="h-8 w-8 text-blue-600" />
+        <IndianRupee className="h-8 w-8 text-blue-600" />
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Select Vendor</h1>
           <p className="text-gray-600">Choose a vendor to view financial details</p>

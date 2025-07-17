@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { apiService, Balance, LedgerEntry, CreditNote } from '../services/api';
-import { Loader2, AlertCircle, TrendingUp, TrendingDown, DollarSign, Calendar, FileText, CreditCard, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Loader2, AlertCircle, TrendingUp, TrendingDown, IndianRupee, Calendar, FileText, CreditCard, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 const VendorDetails: React.FC = () => {
   const { gstin } = useParams<{ gstin: string }>();
@@ -40,6 +40,10 @@ const VendorDetails: React.FC = () => {
   }, [gstin]);
 
   const formatCurrency = (amount: string) => {
+    // Handle null, undefined, or invalid values
+    if (!amount || amount === 'null' || amount === 'undefined' || isNaN(parseFloat(amount))) {
+      return '₹0.00';
+    }
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
@@ -159,7 +163,7 @@ const VendorDetails: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-3">
-        <DollarSign className="h-8 w-8 text-blue-600" />
+        <IndianRupee className="h-8 w-8 text-blue-600" />
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Vendor Financial Details</h1>
           <p className="text-gray-600">GSTIN: {gstin}</p>
@@ -180,7 +184,7 @@ const VendorDetails: React.FC = () => {
                 </p>
               </div>
               <div className="p-3 bg-blue-100 rounded-full">
-                <DollarSign className="h-6 w-6 text-blue-600" />
+                <IndianRupee className="h-6 w-6 text-blue-600" />
               </div>
             </div>
           </div>

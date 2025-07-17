@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, FileText, Users, Building, DollarSign } from 'lucide-react';
+import { LogOut, FileText, Users, Building, IndianRupee } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -63,7 +63,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                 >
-                  <DollarSign className="h-4 w-4" />
+                  <IndianRupee className="h-4 w-4" />
                   <span>Financial Details</span>
                 </Link>
               </div>
