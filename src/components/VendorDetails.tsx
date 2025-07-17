@@ -324,8 +324,8 @@ const VendorDetails: React.FC = () => {
                         <td className="px-4 py-3 text-sm text-center text-gray-900">{formatDate(entry.date)}</td>
                         <td className="px-4 py-3 text-sm text-center text-gray-900">{entry.description}</td>
                         <td className="px-4 py-3 text-sm text-center">
-                          <span className={`font-medium capitalize ${getTransactionTypeColor(entry.transaction_type)}`}>
-                            {entry.transaction_type}
+                          <span className={`font-medium capitalize ${getTransactionTypeColor(entry.transaction_type || '')}`}>
+                            {entry.transaction_type || 'N/A'}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-sm text-center text-red-600 font-medium">
