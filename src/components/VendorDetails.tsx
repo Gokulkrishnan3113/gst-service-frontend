@@ -69,6 +69,9 @@ const VendorDetails: React.FC = () => {
   };
 
   const getStatusColor = (status: string) => {
+    if (!status || typeof status !== 'string') {
+      return 'bg-gray-100 text-gray-800';
+    }
     switch (status.toLowerCase()) {
       case 'approved':
       case 'processed':
