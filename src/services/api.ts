@@ -155,4 +155,3 @@ export const apiService = {
     return result.data;
   },
 };
-      throw new Error(`Failed to fetch credit notes: ${response.status}`);
