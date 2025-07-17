@@ -59,6 +59,40 @@ export interface Filing {
   invoices: Invoice[];
 }
 
+export interface LedgerEntry {
+  date: string;
+  description: string;
+  debit: string;
+  credit: string;
+  balance: string;
+  transaction_type: string;
+  reference_id?: string;
+}
+
+export interface Balance {
+  gstin: string;
+  vendor_name: string;
+  current_balance: string;
+  total_credits: string;
+  total_debits: string;
+  last_updated: string;
+  balance_type: string;
+}
+
+export interface CreditNote {
+  credit_note_id: string;
+  invoice_id: string;
+  date: string;
+  amount: string;
+  reason: string;
+  status: string;
+  cgst: string;
+  sgst: string;
+  igst: string;
+  net_amount: string;
+  created_at: string;
+}
+
 export interface ApiResponse<T> {
   data: T;
 }
@@ -88,6 +122,33 @@ export const apiService = {
       throw new Error('Failed to fetch all filings');
     }
     const result: ApiResponse<Filing[]> = await response.json();
+    return result.data;
+  },
+
+  async getLedger(gstin: string): Promise<LedgerEntry[]> {
+    const response = await fetch(`${API_BASE_URL}/ledger/${gstin}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch ledger');
+    }
+    const result: ApiResponse<LedgerEntry[]> = await response.json();
+    return result.data;
+  },
+
+  async getBalance(gstin: string): Promise<Balance> {
+    const response = await fetch(`${API_BASE_URL}/balance/${gstin}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch balance');
+    }
+    const result: ApiResponse<Balance> = await response.json();
+    return result.data;
+  },
+
+  async getCreditNotes(gstin: string): Promise<CreditNote[]> {
+    const response = await fetch(`${API_BASE_URL}/credit-notes/${gstin}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch credit notes');
+    }
+    const result: ApiResponse<CreditNote[]> = await response.json();
     return result.data;
   },
 };

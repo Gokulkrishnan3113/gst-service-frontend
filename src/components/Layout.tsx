@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, FileText, Users, Building } from 'lucide-react';
+import { LogOut, FileText, Users, Building, DollarSign } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -53,6 +53,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 >
                   <FileText className="h-4 w-4" />
                   <span>All Filings</span>
+                </Link>
+                
+                <Link
+                  to="/vendor-details"
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    location.pathname.startsWith('/vendor-details')
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                >
+                  <DollarSign className="h-4 w-4" />
+                  <span>Financial Details</span>
                 </Link>
               </div>
             </div>

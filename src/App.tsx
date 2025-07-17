@@ -7,6 +7,8 @@ import Login from './components/Login';
 import Vendors from './components/Vendors';
 import GSTFilings from './components/GSTFilings';
 import AllFilings from './components/AllFilings';
+import VendorSelector from './components/VendorSelector';
+import VendorDetails from './components/VendorDetails';
 
 function App() {
   return (
@@ -41,6 +43,26 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <AllFilings />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/vendor-details"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <VendorSelector />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/vendor-details/:gstin"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <VendorDetails />
                 </Layout>
               </ProtectedRoute>
             }
