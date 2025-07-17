@@ -17,20 +17,29 @@ const VendorDetails: React.FC = () => {
     const fetchData = async () => {
       if (!gstin) return;
 
+      console.log('Fetching data for GSTIN:', gstin);
+      
       try {
         setLoading(true);
+        setError(null);
+        
+        console.log('Making API calls...');
         const [balanceData, ledgerData, creditNotesData] = await Promise.all([
           apiService.getBalance(gstin),
           apiService.getLedger(gstin),
           apiService.getCreditNotes(gstin),
         ]);
         
+        console.log('Balance data:', balanceData);
+        console.log('Ledger data:', ledgerData);
+        console.log('Credit notes data:', creditNotesData);
+        
         setBalance(balanceData);
         setLedger(ledgerData);
         setCreditNotes(creditNotesData);
       } catch (err) {
+        console.error('Error in fetchData:', err);
         setError('Failed to fetch vendor details. Please try again.');
-        console.error('Error fetching vendor details:', err);
       } finally {
         setLoading(false);
       }
