@@ -12,6 +12,7 @@ const VendorDetails: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'balance' | 'ledger' | 'credit-notes'>('balance');
   const [sortConfig, setSortConfig] = useState<{ field: string; direction: 'asc' | 'desc' } | null>(null);
+  const [apiCallsCompleted, setApiCallsCompleted] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,24 +23,47 @@ const VendorDetails: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
+        setApiCallsCompleted(false);
         
         console.log('Making API calls...');
-        const [balanceData, ledgerData, creditNotesData] = await Promise.all([
-          apiService.getBalance(gstin),
-          apiService.getLedger(gstin),
-          apiService.getCreditNotes(gstin),
-        ]);
         
-        console.log('Balance data:', balanceData);
-        console.log('Ledger data:', ledgerData);
-        console.log('Credit notes data:', creditNotesData);
+        // Make API calls sequentially to better handle errors
+        let balanceData = null;
+        let ledgerData = [];
+        let creditNotesData = [];
+        
+        try {
+          console.log('Fetching balance...');
+          balanceData = await apiService.getBalance(gstin);
+          console.log('Balance response:', balanceData);
+        } catch (balanceError) {
+          console.error('Balance API error:', balanceError);
+        }
+        
+        try {
+          console.log('Fetching ledger...');
+          ledgerData = await apiService.getLedger(gstin);
+          console.log('Ledger response:', ledgerData);
+        } catch (ledgerError) {
+          console.error('Ledger API error:', ledgerError);
+        }
+        
+        try {
+          console.log('Fetching credit notes...');
+          creditNotesData = await apiService.getCreditNotes(gstin);
+          console.log('Credit notes response:', creditNotesData);
+        } catch (creditError) {
+          console.error('Credit notes API error:', creditError);
+        }
+        
+        setApiCallsCompleted(true);
         
         setBalance(balanceData);
-        setLedger(ledgerData);
-        setCreditNotes(creditNotesData);
+        setLedger(ledgerData || []);
+        setCreditNotes(creditNotesData || []);
       } catch (err) {
         console.error('Error in fetchData:', err);
-        setError('Failed to fetch vendor details. Please try again.');
+        setError(`Failed to fetch vendor details: ${err instanceof Error ? err.message : 'Unknown error'}`);
       } finally {
         setLoading(false);
       }
@@ -50,13 +74,14 @@ const VendorDetails: React.FC = () => {
 
   const formatCurrency = (amount: string) => {
     // Handle null, undefined, or invalid values
-    if (!amount || amount === 'null' || amount === 'undefined' || isNaN(parseFloat(amount))) {
+    if (!amount || amount === 'null' || amount === 'undefined' || amount === '' || isNaN(parseFloat(amount))) {
       return '₹0.00';
     }
+    const numericAmount = parseFloat(amount);
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-    }).format(parseFloat(amount));
+    }).format(numericAmount);
   };
 
   const formatDate = (dateString: string) => {
@@ -149,7 +174,9 @@ const VendorDetails: React.FC = () => {
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          <p className="text-gray-600">Loading vendor details...</p>
+          <p className="text-gray-600">
+            {apiCallsCompleted ? 'Processing data...' : 'Loading vendor details...'}
+          </p>
         </div>
       </div>
     );
@@ -183,49 +210,53 @@ const VendorDetails: React.FC = () => {
         </div>
       </div>
 
-      {/* Balance Overview */}
-      {balance && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">Current Balance</p>
-                <p className="text-2xl font-bold text-gray-900">{formatCurrency(balance.current_balance)}</p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Type: <span className="capitalize">{balance.balance_type}</span>
-                </p>
-              </div>
-              <div className="p-3 bg-blue-100 rounded-full">
-                <IndianRupee className="h-6 w-6 text-blue-600" />
-              </div>
+      {/* Balance Overview - Always show, even if data is null */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500">Current Balance</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {balance ? formatCurrency(balance.current_balance || '0') : '₹0.00'}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                Type: <span className="capitalize">{balance?.balance_type || 'N/A'}</span>
+              </p>
             </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">Total Credits</p>
-                <p className="text-2xl font-bold text-green-700">{formatCurrency(balance.total_credits)}</p>
-              </div>
-              <div className="p-3 bg-green-100 rounded-full">
-                <TrendingUp className="h-6 w-6 text-green-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">Total Debits</p>
-                <p className="text-2xl font-bold text-red-700">{formatCurrency(balance.total_debits)}</p>
-              </div>
-              <div className="p-3 bg-red-100 rounded-full">
-                <TrendingDown className="h-6 w-6 text-red-600" />
-              </div>
+            <div className="p-3 bg-blue-100 rounded-full">
+              <IndianRupee className="h-6 w-6 text-blue-600" />
             </div>
           </div>
         </div>
-      )}
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500">Total Credits</p>
+              <p className="text-2xl font-bold text-green-700">
+                {balance ? formatCurrency(balance.total_credits || '0') : '₹0.00'}
+              </p>
+            </div>
+            <div className="p-3 bg-green-100 rounded-full">
+              <TrendingUp className="h-6 w-6 text-green-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500">Total Debits</p>
+              <p className="text-2xl font-bold text-red-700">
+                {balance ? formatCurrency(balance.total_debits || '0') : '₹0.00'}
+              </p>
+            </div>
+            <div className="p-3 bg-red-100 rounded-full">
+              <TrendingDown className="h-6 w-6 text-red-600" />
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Tabs */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -267,139 +298,181 @@ const VendorDetails: React.FC = () => {
         <div className="p-6">
           {activeTab === 'balance' && balance && (
             <div className="space-y-4">
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">Balance Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-blue-700">Last Updated</p>
-                    <p className="font-medium text-blue-900">{formatDateTime(balance.last_updated)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-blue-700">Balance Type</p>
-                    <p className="font-medium text-blue-900 capitalize">{balance.balance_type}</p>
+              {balance ? (
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                  <h3 className="text-lg font-semibold text-blue-900 mb-2">Balance Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-blue-700">Last Updated</p>
+                      <p className="font-medium text-blue-900">
+                        {balance.last_updated ? formatDateTime(balance.last_updated) : 'N/A'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-blue-700">Balance Type</p>
+                      <p className="font-medium text-blue-900 capitalize">{balance.balance_type || 'N/A'}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                  <p className="text-yellow-800">No balance information available for this vendor.</p>
+                </div>
+              )}
             </div>
           )}
 
           {activeTab === 'ledger' && (
             <div className="space-y-4">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                        <button
-                          onClick={() => sortLedger('date')}
-                          className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
-                        >
-                          <span>Date</span>
-                          {getSortIcon('date')}
-                        </button>
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Description</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Type</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                        <button
-                          onClick={() => sortLedger('debit')}
-                          className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
-                        >
-                          <span>Debit</span>
-                          {getSortIcon('debit')}
-                        </button>
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                        <button
-                          onClick={() => sortLedger('credit')}
-                          className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
-                        >
-                          <span>Credit</span>
-                          {getSortIcon('credit')}
-                        </button>
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                        <button
-                          onClick={() => sortLedger('balance')}
-                          className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
-                        >
-                          <span>Balance</span>
-                          {getSortIcon('balance')}
-                        </button>
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Reference</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {ledger.map((entry, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm text-center text-gray-900">{formatDate(entry.date)}</td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-900">{entry.description}</td>
-                        <td className="px-4 py-3 text-sm text-center">
-                          <span className={`font-medium capitalize ${getTransactionTypeColor(entry.transaction_type || '')}`}>
-                            {entry.transaction_type || 'N/A'}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-center text-red-600 font-medium">
-                          {parseFloat(entry.debit) > 0 ? formatCurrency(entry.debit) : '-'}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-center text-green-600 font-medium">
-                          {parseFloat(entry.credit) > 0 ? formatCurrency(entry.credit) : '-'}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">
-                          {formatCurrency(entry.balance)}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-600">
-                          {entry.reference_id || '-'}
-                        </td>
+              {ledger && ledger.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                          <button
+                            onClick={() => sortLedger('date')}
+                            className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                          >
+                            <span>Date</span>
+                            {getSortIcon('date')}
+                          </button>
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Description</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Type</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                          <button
+                            onClick={() => sortLedger('debit')}
+                            className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                          >
+                            <span>Debit</span>
+                            {getSortIcon('debit')}
+                          </button>
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                          <button
+                            onClick={() => sortLedger('credit')}
+                            className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                          >
+                            <span>Credit</span>
+                            {getSortIcon('credit')}
+                          </button>
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                          <button
+                            onClick={() => sortLedger('balance')}
+                            className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                          >
+                            <span>Balance</span>
+                            {getSortIcon('balance')}
+                          </button>
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Reference</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {ledger.map((entry, index) => (
+                        <tr key={index} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-sm text-center text-gray-900">
+                            {entry.date ? formatDate(entry.date) : 'N/A'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-gray-900">
+                            {entry.description || 'N/A'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center">
+                            <span className={`font-medium capitalize ${getTransactionTypeColor(entry.transaction_type || '')}`}>
+                              {entry.transaction_type || 'N/A'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-red-600 font-medium">
+                            {entry.debit && parseFloat(entry.debit) > 0 ? formatCurrency(entry.debit) : '-'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-green-600 font-medium">
+                            {entry.credit && parseFloat(entry.credit) > 0 ? formatCurrency(entry.credit) : '-'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">
+                            {entry.balance ? formatCurrency(entry.balance) : '₹0.00'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-gray-600">
+                            {entry.reference_id || '-'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                  <p className="text-yellow-800">No ledger entries found for this vendor.</p>
+                </div>
+              )}
             </div>
           )}
 
           {activeTab === 'credit-notes' && (
             <div className="space-y-4">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Credit Note ID</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Invoice ID</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Date</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Amount</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">CGST</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">SGST</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">IGST</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Net Amount</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Reason</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {creditNotes.map((note) => (
-                      <tr key={note.credit_note_id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm text-center font-medium text-gray-900">{note.credit_note_id}</td>
-                        <td className="px-4 py-3 text-sm text-center text-blue-600 font-medium">{note.invoice_id}</td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-900">{formatDate(note.date)}</td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(note.amount)}</td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(note.cgst)}</td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(note.sgst)}</td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(note.igst)}</td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(note.net_amount)}</td>
-                        <td className="px-4 py-3 text-sm text-center">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(note.status)}`}>
-                            {note.status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-600">{note.reason}</td>
+              {creditNotes && creditNotes.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Credit Note ID</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Invoice ID</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Date</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Amount</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">CGST</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">SGST</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">IGST</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Net Amount</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Reason</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {creditNotes.map((note) => (
+                        <tr key={note.credit_note_id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-sm text-center font-medium text-gray-900">
+                            {note.credit_note_id || 'N/A'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-blue-600 font-medium">
+                            {note.invoice_id || 'N/A'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-gray-900">
+                            {note.date ? formatDate(note.date) : 'N/A'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">
+                            {formatCurrency(note.amount || '0')}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-gray-900">
+                            {formatCurrency(note.cgst || '0')}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-gray-900">
+                            {formatCurrency(note.sgst || '0')}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-gray-900">
+                            {formatCurrency(note.igst || '0')}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">
+                            {formatCurrency(note.net_amount || '0')}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(note.status || '')}`}>
+                              {note.status || 'N/A'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-gray-600">
+                            {note.reason || 'N/A'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                  <p className="text-yellow-800">No credit notes found for this vendor.</p>
+                </div>
+              )}
             </div>
           )}
         </div>
