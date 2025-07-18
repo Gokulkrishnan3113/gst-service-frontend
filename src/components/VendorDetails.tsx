@@ -102,34 +102,46 @@ const VendorDetails: React.FC = () => {
     });
   };
 
-  const getStatusColor = (status: string) => {
-    if (!status || typeof status !== 'string') {
-      return 'bg-gray-100 text-gray-800';
-    }
-    switch (status.toLowerCase()) {
-      case 'approved':
-      case 'processed':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'rejected':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   const getTransactionTypeColor = (type: string) => {
+    if (!type || typeof type !== 'string') {
+      return 'text-gray-600';
+    }
     switch (type.toLowerCase()) {
       case 'credit':
-      case 'payment':
         return 'text-green-600';
       case 'debit':
-      case 'invoice':
         return 'text-red-600';
       default:
         return 'text-gray-600';
     }
+  };
+
+  const calculateTotalBalance = () => {
+    if (!balance) return '0';
+    const igst = parseFloat(balance.igst_balance || '0');
+    const cgst = parseFloat(balance.cgst_balance || '0');
+    const sgst = parseFloat(balance.sgst_balance || '0');
+    return (igst + cgst + sgst).toString();
+  };
+
+  const calculateLedgerTotals = () => {
+    let totalCredits = 0;
+    let totalDebits = 0;
+
+    ledger.forEach(entry => {
+      const igst = parseFloat(entry.igst || '0');
+      const cgst = parseFloat(entry.cgst || '0');
+      const sgst = parseFloat(entry.sgst || '0');
+      const total = igst + cgst + sgst;
+
+      if (entry.txn_type === 'CREDIT') {
+        totalCredits += total;
+      } else if (entry.txn_type === 'DEBIT') {
+        totalDebits += total;
+      }
+    });
+
+    return { totalCredits: totalCredits.toString(), totalDebits: totalDebits.toString() };
   };
 
   const sortLedger = (field: string) => {
@@ -144,10 +156,10 @@ const VendorDetails: React.FC = () => {
       let aValue: any = a[field as keyof LedgerEntry];
       let bValue: any = b[field as keyof LedgerEntry];
 
-      if (field === 'date') {
+      if (field === 'txn_date') {
         aValue = new Date(aValue);
         bValue = new Date(bValue);
-      } else if (['debit', 'credit', 'balance'].includes(field)) {
+      } else if (['igst', 'cgst', 'sgst'].includes(field)) {
         aValue = parseFloat(aValue);
         bValue = parseFloat(bValue);
       }
@@ -168,6 +180,8 @@ const VendorDetails: React.FC = () => {
     }
     return sortConfig.direction === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />;
   };
+
+  const ledgerTotals = calculateLedgerTotals();
 
   if (loading) {
     return (
@@ -206,7 +220,6 @@ const VendorDetails: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Vendor Financial Details</h1>
           <p className="text-gray-600">GSTIN: {gstin}</p>
-          {balance && <p className="text-sm text-gray-500">{balance.vendor_name}</p>}
         </div>
       </div>
 
@@ -217,11 +230,13 @@ const VendorDetails: React.FC = () => {
             <div>
               <p className="text-sm text-gray-500">Current Balance</p>
               <p className="text-2xl font-bold text-gray-900">
-                {balance ? formatCurrency(balance.current_balance || '0') : '₹0.00'}
+                {balance ? formatCurrency(calculateTotalBalance()) : '₹0.00'}
               </p>
-              <p className="text-xs text-gray-400 mt-1">
-                Type: <span className="capitalize">{balance?.balance_type || 'N/A'}</span>
-              </p>
+              <div className="text-xs text-gray-400 mt-1 space-y-1">
+                <div>IGST: {balance ? formatCurrency(balance.igst_balance) : '₹0.00'}</div>
+                <div>CGST: {balance ? formatCurrency(balance.cgst_balance) : '₹0.00'}</div>
+                <div>SGST: {balance ? formatCurrency(balance.sgst_balance) : '₹0.00'}</div>
+              </div>
             </div>
             <div className="p-3 bg-blue-100 rounded-full">
               <IndianRupee className="h-6 w-6 text-blue-600" />
@@ -234,7 +249,7 @@ const VendorDetails: React.FC = () => {
             <div>
               <p className="text-sm text-gray-500">Total Credits</p>
               <p className="text-2xl font-bold text-green-700">
-                {balance ? formatCurrency(balance.total_credits || '0') : '₹0.00'}
+                {formatCurrency(ledgerTotals.totalCredits)}
               </p>
             </div>
             <div className="p-3 bg-green-100 rounded-full">
@@ -248,7 +263,7 @@ const VendorDetails: React.FC = () => {
             <div>
               <p className="text-sm text-gray-500">Total Debits</p>
               <p className="text-2xl font-bold text-red-700">
-                {balance ? formatCurrency(balance.total_debits || '0') : '₹0.00'}
+                {formatCurrency(ledgerTotals.totalDebits)}
               </p>
             </div>
             <div className="p-3 bg-red-100 rounded-full">
@@ -305,12 +320,24 @@ const VendorDetails: React.FC = () => {
                     <div>
                       <p className="text-sm text-blue-700">Last Updated</p>
                       <p className="font-medium text-blue-900">
-                        {balance.last_updated ? formatDateTime(balance.last_updated) : 'N/A'}
+                        {balance.updated_at ? formatDateTime(balance.updated_at) : 'N/A'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-blue-700">Balance Type</p>
-                      <p className="font-medium text-blue-900 capitalize">{balance.balance_type || 'N/A'}</p>
+                      <p className="text-sm text-blue-700">Total Balance</p>
+                      <p className="font-medium text-blue-900">{formatCurrency(calculateTotalBalance())}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-blue-700">IGST Balance</p>
+                      <p className="font-medium text-blue-900">{formatCurrency(balance.igst_balance)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-blue-700">CGST Balance</p>
+                      <p className="font-medium text-blue-900">{formatCurrency(balance.cgst_balance)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-blue-700">SGST Balance</p>
+                      <p className="font-medium text-blue-900">{formatCurrency(balance.sgst_balance)}</p>
                     </div>
                   </div>
                 </div>
@@ -331,70 +358,73 @@ const VendorDetails: React.FC = () => {
                       <tr>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                           <button
-                            onClick={() => sortLedger('date')}
+                            onClick={() => sortLedger('txn_date')}
                             className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                           >
-                            <span>Date</span>
-                            {getSortIcon('date')}
+                            <span>Transaction Date</span>
+                            {getSortIcon('txn_date')}
                           </button>
                         </th>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Description</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Reason</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Type</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                           <button
-                            onClick={() => sortLedger('debit')}
+                            onClick={() => sortLedger('igst')}
                             className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                           >
-                            <span>Debit</span>
-                            {getSortIcon('debit')}
+                            <span>IGST</span>
+                            {getSortIcon('igst')}
                           </button>
                         </th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                           <button
-                            onClick={() => sortLedger('credit')}
+                            onClick={() => sortLedger('cgst')}
                             className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                           >
-                            <span>Credit</span>
-                            {getSortIcon('credit')}
+                            <span>CGST</span>
+                            {getSortIcon('cgst')}
                           </button>
                         </th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                           <button
-                            onClick={() => sortLedger('balance')}
+                            onClick={() => sortLedger('sgst')}
                             className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                           >
-                            <span>Balance</span>
-                            {getSortIcon('balance')}
+                            <span>SGST</span>
+                            {getSortIcon('sgst')}
                           </button>
                         </th>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Reference</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Effective From</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {ledger.map((entry, index) => (
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="px-4 py-3 text-sm text-center text-gray-900">
-                            {entry.date ? formatDate(entry.date) : 'N/A'}
+                            {entry.id}
                           </td>
                           <td className="px-4 py-3 text-sm text-center text-gray-900">
-                            {entry.description || 'N/A'}
+                            {entry.txn_date ? formatDate(entry.txn_date) : 'N/A'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-gray-900">
+                            {entry.txn_reason || 'N/A'}
                           </td>
                           <td className="px-4 py-3 text-sm text-center">
-                            <span className={`font-medium capitalize ${getTransactionTypeColor(entry.transaction_type || '')}`}>
-                              {entry.transaction_type || 'N/A'}
+                            <span className={`font-medium capitalize ${getTransactionTypeColor(entry.txn_type || '')}`}>
+                              {entry.txn_type || 'N/A'}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-sm text-center text-red-600 font-medium">
-                            {entry.debit && parseFloat(entry.debit) > 0 ? formatCurrency(entry.debit) : '-'}
+                          <td className="px-4 py-3 text-sm text-center font-medium">
+                            {formatCurrency(entry.igst)}
                           </td>
-                          <td className="px-4 py-3 text-sm text-center text-green-600 font-medium">
-                            {entry.credit && parseFloat(entry.credit) > 0 ? formatCurrency(entry.credit) : '-'}
+                          <td className="px-4 py-3 text-sm text-center font-medium">
+                            {formatCurrency(entry.cgst)}
                           </td>
-                          <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">
-                            {entry.balance ? formatCurrency(entry.balance) : '₹0.00'}
+                          <td className="px-4 py-3 text-sm text-center font-medium">
+                            {formatCurrency(entry.sgst)}
                           </td>
                           <td className="px-4 py-3 text-sm text-center text-gray-600">
-                            {entry.reference_id || '-'}
+                            {entry.effective_from ? formatDate(entry.effective_from) : 'N/A'}
                           </td>
                         </tr>
                       ))}
@@ -416,29 +446,32 @@ const VendorDetails: React.FC = () => {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Credit Note ID</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">ID</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Invoice ID</th>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Date</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Invoice Date</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Credit Note Date</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Amount</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">CGST</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">SGST</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">IGST</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Net Amount</th>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Reason</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {creditNotes.map((note) => (
-                        <tr key={note.credit_note_id} className="hover:bg-gray-50">
+                        <tr key={note.id} className="hover:bg-gray-50">
                           <td className="px-4 py-3 text-sm text-center font-medium text-gray-900">
-                            {note.credit_note_id || 'N/A'}
+                            {note.id}
                           </td>
                           <td className="px-4 py-3 text-sm text-center text-blue-600 font-medium">
                             {note.invoice_id || 'N/A'}
                           </td>
                           <td className="px-4 py-3 text-sm text-center text-gray-900">
-                            {note.date ? formatDate(note.date) : 'N/A'}
+                            {note.invoice_date ? formatDate(note.invoice_date) : 'N/A'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center text-gray-900">
+                            {note.credit_note_date ? formatDate(note.credit_note_date) : 'N/A'}
                           </td>
                           <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">
                             {formatCurrency(note.amount || '0')}
@@ -454,11 +487,6 @@ const VendorDetails: React.FC = () => {
                           </td>
                           <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">
                             {formatCurrency(note.net_amount || '0')}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-center">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(note.status || '')}`}>
-                              {note.status || 'N/A'}
-                            </span>
                           </td>
                           <td className="px-4 py-3 text-sm text-center text-gray-600">
                             {note.reason || 'N/A'}

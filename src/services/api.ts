@@ -60,37 +60,38 @@ export interface Filing {
 }
 
 export interface LedgerEntry {
-  date: string;
-  description: string;
-  debit: string;
-  credit: string;
-  balance: string;
-  transaction_type: string;
-  reference_id?: string;
+  id: number;
+  gstin: string;
+  txn_type: string;
+  igst: string;
+  cgst: string;
+  sgst: string;
+  txn_date: string;
+  txn_reason: string;
+  effective_from: string;
 }
 
 export interface Balance {
   gstin: string;
-  vendor_name: string;
-  current_balance: string;
-  total_credits: string;
-  total_debits: string;
-  last_updated: string;
-  balance_type: string;
+  igst_balance: string;
+  cgst_balance: string;
+  sgst_balance: string;
+  updated_at: string;
 }
 
 export interface CreditNote {
-  credit_note_id: string;
+  id: number;
+  gstin: string;
+  invoice_ref_id: number;
   invoice_id: string;
-  date: string;
-  amount: string;
+  invoice_date: string;
+  credit_note_date: string;
   reason: string;
-  status: string;
+  amount: string;
   cgst: string;
   sgst: string;
   igst: string;
   net_amount: string;
-  created_at: string;
 }
 
 export interface ApiResponse<T> {
