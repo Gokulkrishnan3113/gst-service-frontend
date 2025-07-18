@@ -105,7 +105,7 @@ export const apiService = {
       throw new Error('Failed to fetch vendors');
     }
     const result: ApiResponse<Vendor[]> = await response.json();
-    return result.data || [];
+    return result.data;
   },
 
   async getFilingsByGstin(gstin: string): Promise<Filing[]> {
@@ -114,7 +114,7 @@ export const apiService = {
       throw new Error('Failed to fetch filings');
     }
     const result: ApiResponse<Filing[]> = await response.json();
-    return result.data || [];
+    return result.data;
   },
 
   async getAllFilings(): Promise<Filing[]> {
@@ -123,7 +123,7 @@ export const apiService = {
       throw new Error('Failed to fetch all filings');
     }
     const result: ApiResponse<Filing[]> = await response.json();
-    return result.data || [];
+    return result.data;
   },
 
   async getLedger(gstin: string): Promise<LedgerEntry[]> {
@@ -132,7 +132,7 @@ export const apiService = {
       throw new Error('Failed to fetch ledger');
     }
     const result: ApiResponse<LedgerEntry[]> = await response.json();
-    return result.data || [];
+    return result.data;
   },
 
   async getBalance(gstin: string): Promise<Balance> {
@@ -153,6 +153,6 @@ export const apiService = {
     const result: ApiResponse<CreditNote[]> = await response.json();
     console.log('Credit Notes API response:', result); // Debug log
     console.log('Ledger API response:', result); // Debug log
-    return result.data || [];
+    return result.data;
   },
 };
