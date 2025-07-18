@@ -356,11 +356,10 @@ const VendorDetails: React.FC = () => {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">ID</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                           <button
                             onClick={() => sortLedger('txn_date')}
-                            className="flex items-center justify-center space-x-1 hover:text-gray-700 transition-colors"
+                            className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                           >
                             <span>Transaction Date</span>
                             {getSortIcon('txn_date')}
@@ -371,7 +370,7 @@ const VendorDetails: React.FC = () => {
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                           <button
                             onClick={() => sortLedger('igst')}
-                            className="flex items-center justify-center space-x-1 hover:text-gray-700 transition-colors"
+                            className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                           >
                             <span>IGST</span>
                             {getSortIcon('igst')}
@@ -380,7 +379,7 @@ const VendorDetails: React.FC = () => {
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                           <button
                             onClick={() => sortLedger('cgst')}
-                            className="flex items-center justify-center space-x-1 hover:text-gray-700 transition-colors"
+                            className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                           >
                             <span>CGST</span>
                             {getSortIcon('cgst')}
@@ -389,7 +388,7 @@ const VendorDetails: React.FC = () => {
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                           <button
                             onClick={() => sortLedger('sgst')}
-                            className="flex items-center justify-center space-x-1 hover:text-gray-700 transition-colors"
+                            className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                           >
                             <span>SGST</span>
                             {getSortIcon('sgst')}
@@ -401,7 +400,7 @@ const VendorDetails: React.FC = () => {
                     <tbody className="divide-y divide-gray-200">
                       {ledger.map((entry, index) => (
                         <tr key={index} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">
+                          <td className="px-4 py-3 text-sm text-center text-gray-900">
                             {entry.id}
                           </td>
                           <td className="px-4 py-3 text-sm text-center text-gray-900">
