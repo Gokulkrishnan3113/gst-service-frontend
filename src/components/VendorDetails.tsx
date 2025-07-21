@@ -357,42 +357,50 @@ const VendorDetails: React.FC = () => {
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                          <button
-                            onClick={() => sortLedger('txn_date')}
-                            className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
-                          >
-                            <span>Transaction Date</span>
-                            {getSortIcon('txn_date')}
-                          </button>
+                          <div className="flex justify-center">
+                            <button
+                              onClick={() => sortLedger('txn_date')}
+                              className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                            >
+                              <span>Transaction Date</span>
+                              {getSortIcon('txn_date')}
+                            </button>
+                          </div>
                         </th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Reason</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Type</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                          <button
-                            onClick={() => sortLedger('igst')}
-                            className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
-                          >
-                            <span>IGST</span>
-                            {getSortIcon('igst')}
-                          </button>
+                          <div className="flex justify-center">
+                            <button
+                              onClick={() => sortLedger('igst')}
+                              className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                            >
+                              <span>IGST</span>
+                              {getSortIcon('igst')}
+                            </button>
+                          </div>
                         </th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                          <button
-                            onClick={() => sortLedger('cgst')}
-                            className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
-                          >
-                            <span>CGST</span>
-                            {getSortIcon('cgst')}
-                          </button>
+                          <div className="flex justify-center">
+                            <button
+                              onClick={() => sortLedger('cgst')}
+                              className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                            >
+                              <span>CGST</span>
+                              {getSortIcon('cgst')}
+                            </button>
+                          </div>
                         </th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                          <button
-                            onClick={() => sortLedger('sgst')}
-                            className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
-                          >
-                            <span>SGST</span>
-                            {getSortIcon('sgst')}
-                          </button>
+                          <div className="flex justify-center">
+                            <button
+                              onClick={() => sortLedger('sgst')}
+                              className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                            >
+                              <span>SGST</span>
+                              {getSortIcon('sgst')}
+                            </button>
+                          </div>
                         </th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Effective From</th>
                       </tr>
@@ -400,9 +408,6 @@ const VendorDetails: React.FC = () => {
                     <tbody className="divide-y divide-gray-200">
                       {ledger.map((entry, index) => (
                         <tr key={index} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 text-sm text-center text-gray-900">
-                            {entry.id}
-                          </td>
                           <td className="px-4 py-3 text-sm text-center text-gray-900">
                             {entry.txn_date ? formatDate(entry.txn_date) : 'N/A'}
                           </td>
@@ -446,7 +451,6 @@ const VendorDetails: React.FC = () => {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">ID</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Invoice ID</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Invoice Date</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Credit Note Date</th>
@@ -461,9 +465,6 @@ const VendorDetails: React.FC = () => {
                     <tbody className="divide-y divide-gray-200">
                       {creditNotes.map((note) => (
                         <tr key={note.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 text-sm text-center font-medium text-gray-900">
-                            {note.id}
-                          </td>
                           <td className="px-4 py-3 text-sm text-center text-blue-600 font-medium">
                             {note.invoice_id || 'N/A'}
                           </td>
