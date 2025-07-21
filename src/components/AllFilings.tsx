@@ -45,6 +45,7 @@ const AllFilings: React.FC = () => {
       itc: 0,
       productcount: 0,
       buying_price: 0,
+      amount_paid: 0,
     };
 
     invoices.forEach((invoice) => {
@@ -56,6 +57,7 @@ const AllFilings: React.FC = () => {
       totals.itc += parseFloat(invoice.itc);
       totals.productcount += invoice.products.length;
       totals.buying_price += parseFloat(invoice.buying_price);
+      totals.amount_paid += parseFloat(invoice.amount_paid || '0');
     });
 
     return totals;
@@ -108,6 +110,41 @@ const AllFilings: React.FC = () => {
         return 'bg-yellow-100 text-yellow-800';
       case 'overdue':
         return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getInvoiceStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'completed':
+      case 'processed':
+        return 'bg-green-100 text-green-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'cancelled':
+      case 'rejected':
+        return 'bg-red-100 text-red-800';
+      case 'draft':
+        return 'bg-gray-100 text-gray-800';
+      default:
+        return 'bg-blue-100 text-blue-800';
+    }
+  };
+
+  const getPaymentStatusColor = (paymentStatus: string) => {
+    switch (paymentStatus?.toLowerCase()) {
+      case 'paid':
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'pending':
+      case 'processing':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'failed':
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      case 'partial':
+        return 'bg-orange-100 text-orange-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -324,6 +361,8 @@ const AllFilings: React.FC = () => {
                             <tr>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Invoice ID</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Date</th>
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Payment Status</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">No. of products</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Buying Price</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
@@ -337,6 +376,7 @@ const AllFilings: React.FC = () => {
                                   </button>
                                 </div>
                               </th>
+                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Amount Paid</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">CGST</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">SGST</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">IGST</th>
@@ -388,9 +428,20 @@ const AllFilings: React.FC = () => {
                                       </div>
                                     </td>
                                     <td className="px-4 py-3 text-sm text-center text-gray-600">{formatDate(invoice.date)}</td>
+                                    <td className="px-4 py-3 text-sm text-center">
+                                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getInvoiceStatusColor(invoice.status)}`}>
+                                        {invoice.status}
+                                      </span>
+                                    </td>
+                                    <td className="px-4 py-3 text-sm text-center">
+                                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPaymentStatusColor(invoice.payment_status)}`}>
+                                        {invoice.payment_status}
+                                      </span>
+                                    </td>
                                     <td className="px-4 py-3 text-sm text-center text-gray-600">{invoice.products.length}</td>
                                     <td className="px-4 py-3 text-sm text-center text-gray-700">{formatCurrency(invoice.buying_price)}</td>
                                     <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
+                                    <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.amount_paid || '0')}</td>
                                     <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.cgst)}</td>
                                     <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.sgst)}</td>
                                     <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.igst)}</td>
@@ -400,7 +451,7 @@ const AllFilings: React.FC = () => {
                                   </tr>
                                   {isInvoiceExpanded && (
                                     <tr>
-                                      <td colSpan={12} className="px-4 py-0">
+                                      <td colSpan={15} className="px-4 py-0">
                                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-2">
                                           <div className="flex items-center space-x-2 mb-3">
                                             <Package className="h-5 w-5 text-blue-600" />
@@ -458,11 +509,12 @@ const AllFilings: React.FC = () => {
                               const totals = calculateInvoiceTotals(filing.invoices);
                               return (
                                 <tr className="bg-blue-100 font-semibold text-gray-800">
-                                  <td className="px-4 py-3 text-sm text-center" colSpan={1}>Total</td>
+                                  <td className="px-4 py-3 text-sm text-center" colSpan={3}>Total</td>
                                   <td className="px-4 py-3 text-sm text-center">--</td>
                                   <td className="px-4 py-3 text-sm text-center">{totals.productcount}</td>
                                   <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.buying_price.toFixed(2))}</td>
                                   <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.amount.toFixed(2))}</td>
+                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.amount_paid.toFixed(2))}</td>
                                   <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.cgst.toFixed(2))}</td>
                                   <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.sgst.toFixed(2))}</td>
                                   <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.igst.toFixed(2))}</td>
