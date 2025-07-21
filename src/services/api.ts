@@ -36,6 +36,9 @@ export interface Invoice {
   state: string;
   net_amount: string;
   itc: string;
+  status: string;
+  payment_status: string;
+  amount_paid: string;
   products: Product[];
 }
 
