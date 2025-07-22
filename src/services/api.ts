@@ -123,7 +123,7 @@ export const apiService = {
   async getAllFilings(): Promise<Filing[]> {
     const response = await fetch(`${API_BASE_URL}/filings-with-invoices`);
     if (!response.ok) {
-      throw new Error('Failed to fetch all filings');
+      throw new Error(`Failed to fetch all filings: ${response.status}`);
     }
     const result: ApiResponse<Filing[]> = await response.json();
     return result.data;
