@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Filing, Invoice } from '../services/api';
-import { api } from '../services/api';
+import { apiService } from '../services/api';
 
 interface GSTFilingsProps {
   gstin: string;
@@ -16,7 +16,7 @@ const GSTFilings: React.FC<GSTFilingsProps> = ({ gstin }) => {
     const fetchFilings = async () => {
       try {
         setLoading(true);
-        const response = await api.getFilingsWithInvoices(gstin);
+        const response = await apiService.getFilingsWithInvoices(gstin);
         setFilings(response);
       } catch (err) {
         setError('Failed to fetch filings');
