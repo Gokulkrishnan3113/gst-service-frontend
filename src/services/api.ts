@@ -110,7 +110,7 @@ export const apiService = {
     try {
       const response = await fetch(`${API_BASE_URL}/vendors`, {
         headers: {
-          'Authorization': `Bearer ${DEFAULT_API_KEY}`,
+          'Authorization': DEFAULT_API_KEY,
           'Content-Type': 'application/json',
         },
       });
