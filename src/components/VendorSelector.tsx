@@ -33,7 +33,10 @@ const VendorSelector: React.FC = () => {
   );
 
   const handleVendorSelect = (gstin: string) => {
-    navigate(`/vendor-details/${gstin}`);
+    const selectedVendor = vendors.find(v => v.gstin === gstin);
+    navigate(`/vendor-details/${gstin}`, { 
+      state: { vendor: selectedVendor } 
+    });
   };
 
   if (loading) {

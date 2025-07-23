@@ -1,6 +1,9 @@
 // const API_BASE_URL = 'http://localhost:8080';
 const API_BASE_URL = 'https://gst-service-g776.onrender.com';
 
+// Default API key for vendors and GST filings
+const DEFAULT_API_KEY = 'm8ak3bv7cn2dq9er4fw6gz1hs5jx0ka7c3lf9mj2pl6qy8rt4su1vb5wd0xh3yg7';
+
 export interface Vendor {
   gstin: string;
   name: string;
@@ -9,6 +12,7 @@ export interface Vendor {
   created_at: string;
   is_itc_optedin: boolean;
   turnover: string;
+  api_key: string;
 }
 
 export interface Product {
@@ -103,7 +107,12 @@ export interface ApiResponse<T> {
 
 export const apiService = {
   async getVendors(): Promise<Vendor[]> {
-    const response = await fetch(`${API_BASE_URL}/vendors`);
+    const response = await fetch(`${API_BASE_URL}/vendors`, {
+      headers: {
+        'Authorization': DEFAULT_API_KEY,
+        'Content-Type': 'application/json',
+      },
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch vendors');
     }
@@ -112,7 +121,12 @@ export const apiService = {
   },
 
   async getFilingsByGstin(gstin: string): Promise<Filing[]> {
-    const response = await fetch(`${API_BASE_URL}/filings-with-invoices/${gstin}`);
+    const response = await fetch(`${API_BASE_URL}/gst/filings-with-invoices/${gstin}`, {
+      headers: {
+        'Authorization': DEFAULT_API_KEY,
+        'Content-Type': 'application/json',
+      },
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch filings');
     }
@@ -121,7 +135,12 @@ export const apiService = {
   },
 
   async getAllFilings(): Promise<Filing[]> {
-    const response = await fetch(`${API_BASE_URL}/filings-with-invoices`);
+    const response = await fetch(`${API_BASE_URL}/gst/filings-with-invoices`, {
+      headers: {
+        'Authorization': DEFAULT_API_KEY,
+        'Content-Type': 'application/json',
+      },
+    });
     if (!response.ok) {
       throw new Error(`Failed to fetch all filings: ${response.status}`);
     }
@@ -129,8 +148,13 @@ export const apiService = {
     return result.data;
   },
 
-  async getLedger(gstin: string): Promise<LedgerEntry[]> {
-    const response = await fetch(`${API_BASE_URL}/ledger/${gstin}`);
+  async getLedger(gstin: string, apiKey: string): Promise<LedgerEntry[]> {
+    const response = await fetch(`${API_BASE_URL}/ledger/${gstin}`, {
+      headers: {
+        'Authorization': apiKey,
+        'Content-Type': 'application/json',
+      },
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch ledger');
     }
@@ -138,8 +162,13 @@ export const apiService = {
     return result.data;
   },
 
-  async getBalance(gstin: string): Promise<Balance> {
-    const response = await fetch(`${API_BASE_URL}/balance/${gstin}`);
+  async getBalance(gstin: string, apiKey: string): Promise<Balance> {
+    const response = await fetch(`${API_BASE_URL}/ledger/balance/${gstin}`, {
+      headers: {
+        'Authorization': apiKey,
+        'Content-Type': 'application/json',
+      },
+    });
     if (!response.ok) {
       throw new Error(`Failed to fetch balance: ${response.status}`);
     }
@@ -148,8 +177,13 @@ export const apiService = {
     return result.data;
   },
 
-  async getCreditNotes(gstin: string): Promise<CreditNote[]> {
-    const response = await fetch(`${API_BASE_URL}/credit-notes/${gstin}`);
+  async getCreditNotes(gstin: string, apiKey: string): Promise<CreditNote[]> {
+    const response = await fetch(`${API_BASE_URL}/ledger/credit-notes/${gstin}`, {
+      headers: {
+        'Authorization': apiKey,
+        'Content-Type': 'application/json',
+      },
+    });
     if (!response.ok) {
       throw new Error(`Failed to fetch ledger: ${response.status}`);
     }

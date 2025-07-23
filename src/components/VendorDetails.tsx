@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { apiService, Balance, LedgerEntry, CreditNote } from '../services/api';
 import { Loader2, AlertCircle, TrendingUp, TrendingDown, IndianRupee, Calendar, FileText, CreditCard, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 const VendorDetails: React.FC = () => {
   const { gstin } = useParams<{ gstin: string }>();
+  const location = useLocation();
+  const vendor = location.state?.vendor;
   const [balance, setBalance] = useState<Balance | null>(null);
   const [ledger, setLedger] = useState<LedgerEntry[]>([]);
   const [creditNotes, setCreditNotes] = useState<CreditNote[]>([]);
@@ -16,9 +18,14 @@ const VendorDetails: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!gstin) return;
+      if (!gstin || !vendor?.api_key) {
+        setError('Missing vendor information or API key');
+        setLoading(false);
+        return;
+      }
 
       console.log('Fetching data for GSTIN:', gstin);
+      console.log('Using API key:', vendor.api_key);
       
       try {
         setLoading(true);
@@ -34,7 +41,7 @@ const VendorDetails: React.FC = () => {
         
         try {
           console.log('Fetching balance...');
-          balanceData = await apiService.getBalance(gstin);
+          balanceData = await apiService.getBalance(gstin, vendor.api_key);
           console.log('Balance response:', balanceData);
         } catch (balanceError) {
           console.error('Balance API error:', balanceError);
@@ -42,7 +49,7 @@ const VendorDetails: React.FC = () => {
         
         try {
           console.log('Fetching ledger...');
-          ledgerData = await apiService.getLedger(gstin);
+          ledgerData = await apiService.getLedger(gstin, vendor.api_key);
           console.log('Ledger response:', ledgerData);
         } catch (ledgerError) {
           console.error('Ledger API error:', ledgerError);
@@ -50,7 +57,7 @@ const VendorDetails: React.FC = () => {
         
         try {
           console.log('Fetching credit notes...');
-          creditNotesData = await apiService.getCreditNotes(gstin);
+          creditNotesData = await apiService.getCreditNotes(gstin, vendor.api_key);
           console.log('Credit notes response:', creditNotesData);
         } catch (creditError) {
           console.error('Credit notes API error:', creditError);
@@ -70,7 +77,7 @@ const VendorDetails: React.FC = () => {
     };
 
     fetchData();
-  }, [gstin]);
+  }, [gstin, vendor]);
 
   const formatCurrency = (amount: string) => {
     // Handle null, undefined, or invalid values
@@ -219,7 +226,9 @@ const VendorDetails: React.FC = () => {
         <IndianRupee className="h-8 w-8 text-blue-600" />
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Vendor Financial Details</h1>
-          <p className="text-gray-600">GSTIN: {gstin}</p>
+          <p className="text-gray-600">
+            {vendor?.name} - GSTIN: {gstin}
+          </p>
         </div>
       </div>
 
