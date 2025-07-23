@@ -109,7 +109,7 @@ export const apiService = {
   async getVendors(): Promise<Vendor[]> {
     const response = await fetch(`${API_BASE_URL}/vendors`, {
       headers: {
-        'Authorization': DEFAULT_API_KEY,
+        'Authorization': `Bearer ${DEFAULT_API_KEY}`,
         'Content-Type': 'application/json',
       },
     });
@@ -123,7 +123,7 @@ export const apiService = {
   async getFilingsByGstin(gstin: string): Promise<Filing[]> {
     const response = await fetch(`${API_BASE_URL}/gst/filings-with-invoices/${gstin}`, {
       headers: {
-        'Authorization': DEFAULT_API_KEY,
+        'Authorization': `Bearer ${DEFAULT_API_KEY}`,
         'Content-Type': 'application/json',
       },
     });
@@ -137,7 +137,7 @@ export const apiService = {
   async getAllFilings(): Promise<Filing[]> {
     const response = await fetch(`${API_BASE_URL}/gst/filings-with-invoices`, {
       headers: {
-        'Authorization': DEFAULT_API_KEY,
+        'Authorization': `Bearer ${DEFAULT_API_KEY}`,
         'Content-Type': 'application/json',
       },
     });
@@ -151,7 +151,7 @@ export const apiService = {
   async getLedger(gstin: string, apiKey: string): Promise<LedgerEntry[]> {
     const response = await fetch(`${API_BASE_URL}/ledger/${gstin}`, {
       headers: {
-        'Authorization': apiKey,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
     });
@@ -165,7 +165,7 @@ export const apiService = {
   async getBalance(gstin: string, apiKey: string): Promise<Balance> {
     const response = await fetch(`${API_BASE_URL}/ledger/balance/${gstin}`, {
       headers: {
-        'Authorization': apiKey,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
     });
@@ -180,7 +180,7 @@ export const apiService = {
   async getCreditNotes(gstin: string, apiKey: string): Promise<CreditNote[]> {
     const response = await fetch(`${API_BASE_URL}/ledger/credit-notes/${gstin}`, {
       headers: {
-        'Authorization': apiKey,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
     });
