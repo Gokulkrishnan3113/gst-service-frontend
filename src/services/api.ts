@@ -114,7 +114,7 @@ export const apiService = {
       },
     });
     if (!response.ok) {
-      throw new Error('Failed to fetch vendors');
+      throw new Error(`Failed to fetch vendors: ${response.status} ${response.statusText}`);
     }
     const result: ApiResponse<Vendor[]> = await response.json();
     return result.data;
