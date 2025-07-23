@@ -107,29 +107,17 @@ export interface ApiResponse<T> {
 
 export const apiService = {
   async getVendors(): Promise<Vendor[]> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/vendors`, {
-        headers: {
-          'Authorization': DEFAULT_API_KEY,
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('API Error Response:', errorText);
-        throw new Error(`Failed to fetch vendors: ${response.status} ${response.statusText}`);
-      }
-      
-      const result: ApiResponse<Vendor[]> = await response.json();
-      return result.data;
-    } catch (error) {
-      console.error('Network Error:', error);
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        throw new Error('Network error: Unable to connect to the server. Please check if the backend service is running.');
-      }
-      throw error;
+    const response = await fetch(`${API_BASE_URL}/vendors`, {
+      headers: {
+        'Authorization': DEFAULT_API_KEY,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch vendors');
     }
+    const result: ApiResponse<Vendor[]> = await response.json();
+    return result.data;
   },
 
   async getFilingsByGstin(gstin: string): Promise<Filing[]> {
