@@ -12,7 +12,9 @@ export interface Vendor {
   created_at: string;
   is_itc_optedin: boolean;
   turnover: string;
+  email: string;
   api_key: string;
+  secret_key: string;
 }
 
 export interface Product {
@@ -102,14 +104,16 @@ export interface CreditNote {
 }
 
 export interface ApiResponse<T> {
+  success: boolean;
   data: T;
+  vendors_count?: number;
 }
 
 export const apiService = {
   async getVendors(): Promise<Vendor[]> {
     const response = await fetch(`${API_BASE_URL}/vendors`, {
       headers: {
-        'Authorization': `Bearer ${DEFAULT_API_KEY}`,
+        'Authorization': DEFAULT_API_KEY,
         'Content-Type': 'application/json',
       },
     });
@@ -123,7 +127,7 @@ export const apiService = {
   async getFilingsByGstin(gstin: string): Promise<Filing[]> {
     const response = await fetch(`${API_BASE_URL}/gst/filings-with-invoices/${gstin}`, {
       headers: {
-        'Authorization': `Bearer ${DEFAULT_API_KEY}`,
+        'Authorization': DEFAULT_API_KEY,
         'Content-Type': 'application/json',
       },
     });
@@ -137,7 +141,7 @@ export const apiService = {
   async getAllFilings(): Promise<Filing[]> {
     const response = await fetch(`${API_BASE_URL}/gst/filings-with-invoices`, {
       headers: {
-        'Authorization': `Bearer ${DEFAULT_API_KEY}`,
+        'Authorization': DEFAULT_API_KEY,
         'Content-Type': 'application/json',
       },
     });
@@ -151,7 +155,7 @@ export const apiService = {
   async getLedger(gstin: string, apiKey: string): Promise<LedgerEntry[]> {
     const response = await fetch(`${API_BASE_URL}/ledger/${gstin}`, {
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': apiKey,
         'Content-Type': 'application/json',
       },
     });
@@ -165,7 +169,7 @@ export const apiService = {
   async getBalance(gstin: string, apiKey: string): Promise<Balance> {
     const response = await fetch(`${API_BASE_URL}/ledger/balance/${gstin}`, {
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': apiKey,
         'Content-Type': 'application/json',
       },
     });
@@ -180,16 +184,15 @@ export const apiService = {
   async getCreditNotes(gstin: string, apiKey: string): Promise<CreditNote[]> {
     const response = await fetch(`${API_BASE_URL}/ledger/credit-notes/${gstin}`, {
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': apiKey,
         'Content-Type': 'application/json',
       },
     });
     if (!response.ok) {
-      throw new Error(`Failed to fetch ledger: ${response.status}`);
+      throw new Error(`Failed to fetch credit notes: ${response.status}`);
     }
     const result: ApiResponse<CreditNote[]> = await response.json();
     console.log('Credit Notes API response:', result); // Debug log
-    console.log('Ledger API response:', result); // Debug log
     return result.data;
   },
 };
