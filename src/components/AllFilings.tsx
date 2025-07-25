@@ -359,51 +359,50 @@ const AllFilings: React.FC = () => {
                         <table className="min-w-full divide-y divide-gray-200">
                           <thead className="bg-gray-50">
                             <tr>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Invoice ID</th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Date</th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Payment Status</th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">No. of products</th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Buying Price</th>
+                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Invoice ID</th>
+                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Date</th>
+                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Status</th>
+                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Payment Status</th>
+                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">No. of Products</th>
+                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Buying Price</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                                 <div className="flex justify-center">
                                   <button
                                     onClick={() => sortInvoices(filingId, 'amount')}
-                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors whitespace-nowrap"
                                   >
-                                    <span>AMOUNT </span>
+                                    <span>AMOUNT</span>
                                     {getSortIcon(filingId, 'amount')}
                                   </button>
                                 </div>
                               </th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Amount Paid</th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">CGST</th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">SGST</th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">IGST</th>
+                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Amount Paid</th>
+                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">CGST</th>
+                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">SGST</th>
+                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">IGST</th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                                 <div className="flex justify-center">
                                   <button
                                     onClick={() => sortInvoices(filingId, 'net_amount')}
-                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors whitespace-nowrap"
                                   >
-                                    <span>NET AMOUNT </span>
+                                    <span>NET AMOUNT</span>
                                     {getSortIcon(filingId, 'net_amount')}
                                   </button>
                                 </div>
                               </th>
                               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                                 <div className="flex justify-center">
-
                                   <button
                                     onClick={() => sortInvoices(filingId, 'itc')}
-                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
+                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors whitespace-nowrap"
                                   >
-                                    <span>ITC </span>
+                                    <span>ITC</span>
                                     {getSortIcon(filingId, 'itc')}
                                   </button>
                                 </div>
                               </th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">State</th>
+                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">State</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-200">
@@ -424,10 +423,10 @@ const AllFilings: React.FC = () => {
                                         ) : (
                                           <ChevronRight className="h-4 w-4 text-gray-400" />
                                         )}
-                                        <span>{invoice.invoice_id}</span>
+                                        <span className="whitespace-nowrap">{invoice.invoice_id}</span>
                                       </div>
                                     </td>
-                                    <td className="px-4 py-3 text-sm text-center text-gray-600">{formatDate(invoice.date)}</td>
+                                    <td className="px-3 py-3 text-sm text-center text-gray-600 whitespace-nowrap">{formatDate(invoice.date)}</td>
                                     <td className="px-4 py-3 text-sm text-center">
                                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getInvoiceStatusColor(invoice.status)}`}>
                                         {invoice.status}
@@ -438,20 +437,20 @@ const AllFilings: React.FC = () => {
                                         {invoice.payment_status}
                                       </span>
                                     </td>
-                                    <td className="px-4 py-3 text-sm text-center text-gray-600">{invoice.products.length}</td>
-                                    <td className="px-4 py-3 text-sm text-center text-gray-700">{formatCurrency(invoice.buying_price)}</td>
-                                    <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
-                                    <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.amount_paid || '0')}</td>
-                                    <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.cgst)}</td>
-                                    <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.sgst)}</td>
-                                    <td className="px-4 py-3 text-sm text-center text-gray-900">{formatCurrency(invoice.igst)}</td>
-                                    <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">{formatCurrency(invoice.net_amount)}</td>
-                                    <td className="px-4 py-3 text-sm text-center text-gray-700">{formatCurrency(invoice.itc)}</td>
-                                    <td className="px-4 py-3 text-sm text-center text-gray-600">{invoice.state}</td>
+                                    <td className="px-3 py-3 text-sm text-center text-gray-600 whitespace-nowrap">{invoice.products.length}</td>
+                                    <td className="px-3 py-3 text-sm text-center text-gray-700 whitespace-nowrap">{formatCurrency(invoice.buying_price)}</td>
+                                    <td className="px-3 py-3 text-sm text-center text-gray-900 font-medium whitespace-nowrap">{formatCurrency(invoice.amount)}</td>
+                                    <td className="px-3 py-3 text-sm text-center text-gray-900 font-medium whitespace-nowrap">{formatCurrency(invoice.amount_paid || '0')}</td>
+                                    <td className="px-3 py-3 text-sm text-center text-gray-900 whitespace-nowrap">{formatCurrency(invoice.cgst)}</td>
+                                    <td className="px-3 py-3 text-sm text-center text-gray-900 whitespace-nowrap">{formatCurrency(invoice.sgst)}</td>
+                                    <td className="px-3 py-3 text-sm text-center text-gray-900 whitespace-nowrap">{formatCurrency(invoice.igst)}</td>
+                                    <td className="px-3 py-3 text-sm text-center text-gray-900 font-medium whitespace-nowrap">{formatCurrency(invoice.net_amount)}</td>
+                                    <td className="px-3 py-3 text-sm text-center text-gray-700 whitespace-nowrap">{formatCurrency(invoice.itc)}</td>
+                                    <td className="px-3 py-3 text-sm text-center text-gray-600 whitespace-nowrap">{invoice.state}</td>
                                   </tr>
                                   {isInvoiceExpanded && (
                                     <tr>
-                                      <td colSpan={15} className="px-4 py-0">
+                                      <td colSpan={14} className="px-4 py-0">
                                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-2">
                                           <div className="flex items-center space-x-2 mb-3">
                                             <Package className="h-5 w-5 text-blue-600" />
@@ -461,38 +460,37 @@ const AllFilings: React.FC = () => {
                                             <table className="min-w-full divide-y divide-blue-200">
                                               <thead className="bg-blue-100">
                                                 <tr>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">SKU</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Product Name</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Category</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Buying Price</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Unit Price</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Quantity</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Discount %</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">Price After Discount</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">CGST</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">SGST</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase">IGST</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">SKU</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">Product Name</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">Category</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">Buying Price</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">Unit Price</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">Quantity</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">Discount %</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">Price After Discount</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">CGST</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">SGST</th>
+                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">IGST</th>
                                                 </tr>
                                               </thead>
                                               <tbody className="divide-y divide-blue-200">
                                                 {invoice.products.map((product, productIndex) => (
-                                                  console.log(product),
                                                   <tr key={productIndex} className="bg-white">
-                                                    <td className="px-3 py-2 text-center text-xs font-medium text-gray-900">{product.sku}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900">{product.product_name}</td>
+                                                    <td className="px-3 py-2 text-center text-xs font-medium text-gray-900 whitespace-nowrap">{product.sku}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 whitespace-nowrap">{product.product_name}</td>
                                                     <td className="px-3 py-2 text-center text-xs text-gray-600">
                                                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                                         {product.category}
                                                       </span>
                                                     </td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-700">{formatCurrency(product.buying_price)}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900">{formatCurrency(product.unit_price)}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{product.quantity}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900">{product.discount_percent}%</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.price_after_discount)}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.cgst)}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.sgst)}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.igst)}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-700 whitespace-nowrap">{formatCurrency(product.buying_price)}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 whitespace-nowrap">{formatCurrency(product.unit_price)}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium whitespace-nowrap">{product.quantity}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 whitespace-nowrap">{product.discount_percent}%</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium whitespace-nowrap">{formatCurrency(product.price_after_discount)}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium whitespace-nowrap">{formatCurrency(product.cgst)}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium whitespace-nowrap">{formatCurrency(product.sgst)}</td>
+                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium whitespace-nowrap">{formatCurrency(product.igst)}</td>
                                                   </tr>
                                                 ))}
                                               </tbody>
@@ -509,18 +507,18 @@ const AllFilings: React.FC = () => {
                               const totals = calculateInvoiceTotals(filing.invoices);
                               return (
                                 <tr className="bg-blue-100 font-semibold text-gray-800">
-                                  <td className="px-4 py-3 text-sm text-center" colSpan={3}>Total</td>
-                                  <td className="px-4 py-3 text-sm text-center">--</td>
-                                  <td className="px-4 py-3 text-sm text-center">{totals.productcount}</td>
-                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.buying_price.toFixed(2))}</td>
-                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.amount.toFixed(2))}</td>
-                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.amount_paid.toFixed(2))}</td>
-                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.cgst.toFixed(2))}</td>
-                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.sgst.toFixed(2))}</td>
-                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.igst.toFixed(2))}</td>
-                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.net_amount.toFixed(2))}</td>
-                                  <td className="px-4 py-3 text-sm text-center">{formatCurrency(totals.itc.toFixed(2))}</td>
-                                  <td className="px-4 py-3 text-sm text-center">--</td>
+                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap" colSpan={3}>Total</td>
+                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">--</td>
+                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{totals.productcount}</td>
+                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.buying_price.toFixed(2))}</td>
+                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.amount.toFixed(2))}</td>
+                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.amount_paid.toFixed(2))}</td>
+                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.cgst.toFixed(2))}</td>
+                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.sgst.toFixed(2))}</td>
+                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.igst.toFixed(2))}</td>
+                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.net_amount.toFixed(2))}</td>
+                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.itc.toFixed(2))}</td>
+                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">--</td>
                                 </tr>
                               );
                             })()}
