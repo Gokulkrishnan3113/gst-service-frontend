@@ -356,53 +356,54 @@ const AllFilings: React.FC = () => {
                     <div>
                       <h4 className="text-lg font-semibold text-gray-900 mb-4">Invoice Details</h4>
                       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                        <table className="min-w-full divide-y divide-gray-200">
+                        <div className="overflow-x-auto">
+                          <table className="w-full divide-y divide-gray-200" style={{ minWidth: '1400px' }}>
                           <thead className="bg-gray-50">
                             <tr>
-                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Invoice ID</th>
-                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Date</th>
-                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Status</th>
-                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Payment Status</th>
-                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">No. of Products</th>
-                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Buying Price</th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '100px' }}>Invoice ID</th>
+                              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '90px' }}>Date</th>
+                              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '80px' }}>Status</th>
+                              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '100px' }}>Payment Status</th>
+                              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '70px' }}>Products</th>
+                              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '90px' }}>Buying Price</th>
+                              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '90px' }}>
                                 <div className="flex justify-center">
                                   <button
                                     onClick={() => sortInvoices(filingId, 'amount')}
-                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors whitespace-nowrap"
+                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                                   >
                                     <span>AMOUNT</span>
                                     {getSortIcon(filingId, 'amount')}
                                   </button>
                                 </div>
                               </th>
-                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Amount Paid</th>
-                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">CGST</th>
-                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">SGST</th>
-                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">IGST</th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '90px' }}>Amount Paid</th>
+                              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '80px' }}>CGST</th>
+                              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '80px' }}>SGST</th>
+                              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '80px' }}>IGST</th>
+                              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '100px' }}>
                                 <div className="flex justify-center">
                                   <button
                                     onClick={() => sortInvoices(filingId, 'net_amount')}
-                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors whitespace-nowrap"
+                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                                   >
                                     <span>NET AMOUNT</span>
                                     {getSortIcon(filingId, 'net_amount')}
                                   </button>
                                 </div>
                               </th>
-                              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '80px' }}>
                                 <div className="flex justify-center">
                                   <button
                                     onClick={() => sortInvoices(filingId, 'itc')}
-                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors whitespace-nowrap"
+                                    className="flex items-center space-x-1 hover:text-gray-700 transition-colors"
                                   >
                                     <span>ITC</span>
                                     {getSortIcon(filingId, 'itc')}
                                   </button>
                                 </div>
                               </th>
-                              <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase whitespace-nowrap">State</th>
+                              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '80px' }}>State</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-200">
@@ -416,37 +417,37 @@ const AllFilings: React.FC = () => {
                                     className="hover:bg-gray-50 cursor-pointer"
                                     onClick={(e) => toggleInvoiceExpanded(invoiceId, e)}
                                   >
-                                    <td className="px-4 py-3 text-sm text-center font-medium text-gray-900">
+                                    <td className="px-2 py-3 text-sm text-center font-medium text-gray-900">
                                       <div className="flex items-center justify-center space-x-2">
                                         {isInvoiceExpanded ? (
                                           <ChevronDown className="h-4 w-4 text-gray-400" />
                                         ) : (
                                           <ChevronRight className="h-4 w-4 text-gray-400" />
                                         )}
-                                        <span className="whitespace-nowrap">{invoice.invoice_id}</span>
+                                        <span className="text-xs">{invoice.invoice_id}</span>
                                       </div>
                                     </td>
-                                    <td className="px-3 py-3 text-sm text-center text-gray-600 whitespace-nowrap">{formatDate(invoice.date)}</td>
-                                    <td className="px-4 py-3 text-sm text-center">
-                                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getInvoiceStatusColor(invoice.status)}`}>
+                                    <td className="px-2 py-3 text-xs text-center text-gray-600">{formatDate(invoice.date)}</td>
+                                    <td className="px-2 py-3 text-sm text-center">
+                                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${getInvoiceStatusColor(invoice.status)}`}>
                                         {invoice.status}
                                       </span>
                                     </td>
-                                    <td className="px-4 py-3 text-sm text-center">
-                                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPaymentStatusColor(invoice.payment_status)}`}>
+                                    <td className="px-2 py-3 text-sm text-center">
+                                      <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${getPaymentStatusColor(invoice.payment_status)}`}>
                                         {invoice.payment_status}
                                       </span>
                                     </td>
-                                    <td className="px-3 py-3 text-sm text-center text-gray-600 whitespace-nowrap">{invoice.products.length}</td>
-                                    <td className="px-3 py-3 text-sm text-center text-gray-700 whitespace-nowrap">{formatCurrency(invoice.buying_price)}</td>
-                                    <td className="px-3 py-3 text-sm text-center text-gray-900 font-medium whitespace-nowrap">{formatCurrency(invoice.amount)}</td>
-                                    <td className="px-3 py-3 text-sm text-center text-gray-900 font-medium whitespace-nowrap">{formatCurrency(invoice.amount_paid || '0')}</td>
-                                    <td className="px-3 py-3 text-sm text-center text-gray-900 whitespace-nowrap">{formatCurrency(invoice.cgst)}</td>
-                                    <td className="px-3 py-3 text-sm text-center text-gray-900 whitespace-nowrap">{formatCurrency(invoice.sgst)}</td>
-                                    <td className="px-3 py-3 text-sm text-center text-gray-900 whitespace-nowrap">{formatCurrency(invoice.igst)}</td>
-                                    <td className="px-3 py-3 text-sm text-center text-gray-900 font-medium whitespace-nowrap">{formatCurrency(invoice.net_amount)}</td>
-                                    <td className="px-3 py-3 text-sm text-center text-gray-700 whitespace-nowrap">{formatCurrency(invoice.itc)}</td>
-                                    <td className="px-3 py-3 text-sm text-center text-gray-600 whitespace-nowrap">{invoice.state}</td>
+                                    <td className="px-2 py-3 text-xs text-center text-gray-600">{invoice.products.length}</td>
+                                    <td className="px-2 py-3 text-xs text-center text-gray-700">{formatCurrency(invoice.buying_price)}</td>
+                                    <td className="px-2 py-3 text-xs text-center text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
+                                    <td className="px-2 py-3 text-xs text-center text-gray-900 font-medium">{formatCurrency(invoice.amount_paid || '0')}</td>
+                                    <td className="px-2 py-3 text-xs text-center text-gray-900">{formatCurrency(invoice.cgst)}</td>
+                                    <td className="px-2 py-3 text-xs text-center text-gray-900">{formatCurrency(invoice.sgst)}</td>
+                                    <td className="px-2 py-3 text-xs text-center text-gray-900">{formatCurrency(invoice.igst)}</td>
+                                    <td className="px-2 py-3 text-xs text-center text-gray-900 font-medium">{formatCurrency(invoice.net_amount)}</td>
+                                    <td className="px-2 py-3 text-xs text-center text-gray-700">{formatCurrency(invoice.itc)}</td>
+                                    <td className="px-2 py-3 text-xs text-center text-gray-600">{invoice.state}</td>
                                   </tr>
                                   {isInvoiceExpanded && (
                                     <tr>
@@ -457,40 +458,40 @@ const AllFilings: React.FC = () => {
                                             <h5 className="text-sm font-semibold text-blue-800">Product Details</h5>
                                           </div>
                                           <div className="overflow-x-auto">
-                                            <table className="min-w-full divide-y divide-blue-200">
+                                            <table className="w-full divide-y divide-blue-200" style={{ minWidth: '1200px' }}>
                                               <thead className="bg-blue-100">
                                                 <tr>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">SKU</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">Product Name</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">Category</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">Buying Price</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">Unit Price</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">Quantity</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">Discount %</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">Price After Discount</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">CGST</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">SGST</th>
-                                                  <th className="px-3 py-2 text-center text-xs font-medium text-blue-700 uppercase whitespace-nowrap">IGST</th>
+                                                  <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '80px' }}>SKU</th>
+                                                  <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '120px' }}>Product Name</th>
+                                                  <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '100px' }}>Category</th>
+                                                  <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '90px' }}>Buying Price</th>
+                                                  <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '90px' }}>Unit Price</th>
+                                                  <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '70px' }}>Quantity</th>
+                                                  <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '80px' }}>Discount %</th>
+                                                  <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '110px' }}>Price After Discount</th>
+                                                  <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '80px' }}>CGST</th>
+                                                  <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '80px' }}>SGST</th>
+                                                  <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '80px' }}>IGST</th>
                                                 </tr>
                                               </thead>
                                               <tbody className="divide-y divide-blue-200">
                                                 {invoice.products.map((product, productIndex) => (
                                                   <tr key={productIndex} className="bg-white">
-                                                    <td className="px-3 py-2 text-center text-xs font-medium text-gray-900 whitespace-nowrap">{product.sku}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 whitespace-nowrap">{product.product_name}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-600">
-                                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                    <td className="px-2 py-2 text-center text-xs font-medium text-gray-900">{product.sku}</td>
+                                                    <td className="px-2 py-2 text-center text-xs text-gray-900">{product.product_name}</td>
+                                                    <td className="px-2 py-2 text-center text-xs text-gray-600">
+                                                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                                                         {product.category}
                                                       </span>
                                                     </td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-700 whitespace-nowrap">{formatCurrency(product.buying_price)}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 whitespace-nowrap">{formatCurrency(product.unit_price)}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium whitespace-nowrap">{product.quantity}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 whitespace-nowrap">{product.discount_percent}%</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium whitespace-nowrap">{formatCurrency(product.price_after_discount)}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium whitespace-nowrap">{formatCurrency(product.cgst)}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium whitespace-nowrap">{formatCurrency(product.sgst)}</td>
-                                                    <td className="px-3 py-2 text-center text-xs text-gray-900 font-medium whitespace-nowrap">{formatCurrency(product.igst)}</td>
+                                                    <td className="px-2 py-2 text-center text-xs text-gray-700">{formatCurrency(product.buying_price)}</td>
+                                                    <td className="px-2 py-2 text-center text-xs text-gray-900">{formatCurrency(product.unit_price)}</td>
+                                                    <td className="px-2 py-2 text-center text-xs text-gray-900 font-medium">{product.quantity}</td>
+                                                    <td className="px-2 py-2 text-center text-xs text-gray-900">{product.discount_percent}%</td>
+                                                    <td className="px-2 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.price_after_discount)}</td>
+                                                    <td className="px-2 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.cgst)}</td>
+                                                    <td className="px-2 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.sgst)}</td>
+                                                    <td className="px-2 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.igst)}</td>
                                                   </tr>
                                                 ))}
                                               </tbody>
@@ -507,23 +508,24 @@ const AllFilings: React.FC = () => {
                               const totals = calculateInvoiceTotals(filing.invoices);
                               return (
                                 <tr className="bg-blue-100 font-semibold text-gray-800">
-                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap" colSpan={3}>Total</td>
-                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">--</td>
-                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{totals.productcount}</td>
-                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.buying_price.toFixed(2))}</td>
-                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.amount.toFixed(2))}</td>
-                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.amount_paid.toFixed(2))}</td>
-                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.cgst.toFixed(2))}</td>
-                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.sgst.toFixed(2))}</td>
-                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.igst.toFixed(2))}</td>
-                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.net_amount.toFixed(2))}</td>
-                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">{formatCurrency(totals.itc.toFixed(2))}</td>
-                                  <td className="px-3 py-3 text-sm text-center whitespace-nowrap">--</td>
+                                  <td className="px-2 py-3 text-xs text-center" colSpan={3}>Total</td>
+                                  <td className="px-2 py-3 text-xs text-center">--</td>
+                                  <td className="px-2 py-3 text-xs text-center">{totals.productcount}</td>
+                                  <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.buying_price.toFixed(2))}</td>
+                                  <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.amount.toFixed(2))}</td>
+                                  <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.amount_paid.toFixed(2))}</td>
+                                  <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.cgst.toFixed(2))}</td>
+                                  <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.sgst.toFixed(2))}</td>
+                                  <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.igst.toFixed(2))}</td>
+                                  <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.net_amount.toFixed(2))}</td>
+                                  <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.itc.toFixed(2))}</td>
+                                  <td className="px-2 py-3 text-xs text-center">--</td>
                                 </tr>
                               );
                             })()}
                           </tbody>
-                        </table>
+                          </table>
+                        </div>
                       </div>
                     </div>
                   </div>
