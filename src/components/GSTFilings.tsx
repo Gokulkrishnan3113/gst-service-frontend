@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Filing, Invoice } from '../services/api';
 import { apiService } from '../services/api';
-import { FileText, Calendar, IndianRupee, AlertTriangle, ChevronDown, ChevronRight, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
+import { FileText, Calendar, IndianRupee, AlertTriangle, ChevronDown, ChevronRight, Loader2, AlertCircle, ArrowLeft, Package } from 'lucide-react';
 
 const GSTFilings: React.FC = () => {
   const { gstin } = useParams<{ gstin: string }>();
@@ -11,6 +11,7 @@ const GSTFilings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedFiling, setExpandedFiling] = useState<string | null>(null);
+  const [expandedInvoices, setExpandedInvoices] = useState<Set<string>>(new Set());
   const [vendorName, setVendorName] = useState<string>('');
 
   useEffect(() => {
@@ -73,8 +74,92 @@ const GSTFilings: React.FC = () => {
     }
   };
 
+  const getInvoiceStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'completed':
+      case 'processed':
+        return 'bg-green-100 text-green-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'cancelled':
+      case 'rejected':
+        return 'bg-red-100 text-red-800';
+      case 'draft':
+        return 'bg-gray-100 text-gray-800';
+      case 'refunded':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-blue-100 text-blue-800';
+    }
+  };
+
+  const getPaymentStatusColor = (paymentStatus: string) => {
+    switch (paymentStatus?.toLowerCase()) {
+      case 'paid':
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'pending':
+      case 'processing':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'failed':
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      case 'partial':
+        return 'bg-orange-100 text-orange-800';
+      case 'refunded':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const calculateInvoiceTotals = (invoices: Filing['invoices']) => {
+    const totals = {
+      amount: 0,
+      cgst: 0,
+      sgst: 0,
+      igst: 0,
+      net_amount: 0,
+      itc: 0,
+      productcount: 0,
+      buying_price: 0,
+      amount_paid: 0,
+    };
+
+    invoices.forEach((invoice) => {
+      totals.amount += parseFloat(invoice.amount);
+      totals.cgst += parseFloat(invoice.cgst);
+      totals.sgst += parseFloat(invoice.sgst);
+      totals.igst += parseFloat(invoice.igst);
+      totals.net_amount += parseFloat(invoice.net_amount);
+      totals.itc += parseFloat(invoice.itc);
+      totals.productcount += invoice.products.length;
+      totals.buying_price += parseFloat(invoice.buying_price);
+      totals.amount_paid += parseFloat(invoice.amount_paid || '0');
+    });
+
+    return totals;
+  };
+
   const toggleExpanded = (filingId: string) => {
     setExpandedFiling(expandedFiling === filingId ? null : filingId);
+    // Close any expanded invoices when collapsing filing
+    if (expandedFiling === filingId) {
+      setExpandedInvoices(new Set());
+    }
+  };
+
+  const toggleInvoiceExpanded = (invoiceId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpandedInvoices(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(invoiceId)) {
+        newSet.delete(invoiceId);
+      } else {
+        newSet.add(invoiceId);
+      }
+      return newSet;
+    });
   };
 
   if (loading) {
@@ -132,7 +217,9 @@ const GSTFilings: React.FC = () => {
           <FileText className="h-8 w-8 text-blue-600" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">GST Filings</h1>
-            <p className="text-gray-600">GSTIN: {gstin}</p>
+            <p className="text-gray-600">
+              {vendorName} - GSTIN: {gstin}
+            </p>
           </div>
         </div>
         <div className="bg-blue-50 px-4 py-2 rounded-lg">
@@ -231,58 +318,141 @@ const GSTFilings: React.FC = () => {
                       <h4 className="text-lg font-semibold text-gray-900 mb-4">Invoice Details</h4>
                       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                         <div className="overflow-x-auto">
-                          <table className="min-w-full divide-y divide-gray-200">
+                          <table className="w-full divide-y divide-gray-200" style={{ minWidth: '1400px' }}>
                             <thead className="bg-gray-50">
                               <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  Invoice ID
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  Date
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  Amount
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  CGST
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  SGST
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  IGST
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  State
-                                </th>
+                                <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '100px' }}>Invoice ID</th>
+                                <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '90px' }}>Date</th>
+                                <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '80px' }}>Status</th>
+                                <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '100px' }}>Payment Status</th>
+                                <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '70px' }}>Products</th>
+                                <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '90px' }}>Buying Price</th>
+                                <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '90px' }}>Amount</th>
+                                <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '90px' }}>Amount Paid</th>
+                                <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '80px' }}>CGST</th>
+                                <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '80px' }}>SGST</th>
+                                <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '80px' }}>IGST</th>
+                                <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '100px' }}>Net Amount</th>
+                                <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '80px' }}>ITC</th>
+                                <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase" style={{ width: '80px' }}>State</th>
                               </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                              {filing.invoices.map((invoice) => (
-                                <tr key={invoice.invoice_id} className="hover:bg-gray-50">
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    {invoice.invoice_id}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {formatDate(invoice.date)}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {formatCurrency(invoice.amount)}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {formatCurrency(invoice.cgst)}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {formatCurrency(invoice.sgst)}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {formatCurrency(invoice.igst)}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                    {invoice.state}
-                                  </td>
-                                </tr>
-                              ))}
+                            <tbody className="divide-y divide-gray-200">
+                              {filing.invoices.map((invoice) => {
+                                const invoiceId = `${filingId}-${invoice.invoice_id}`;
+                                const isInvoiceExpanded = expandedInvoices.has(invoiceId);
+
+                                return (
+                                  <React.Fragment key={invoice.invoice_id}>
+                                    <tr
+                                      className="hover:bg-gray-50 cursor-pointer"
+                                      onClick={(e) => toggleInvoiceExpanded(invoiceId, e)}
+                                    >
+                                      <td className="px-2 py-3 text-sm text-center font-medium text-gray-900">
+                                        <div className="flex items-center justify-center space-x-2">
+                                          {isInvoiceExpanded ? (
+                                            <ChevronDown className="h-4 w-4 text-gray-400" />
+                                          ) : (
+                                            <ChevronRight className="h-4 w-4 text-gray-400" />
+                                          )}
+                                          <span className="text-xs">{invoice.invoice_id}</span>
+                                        </div>
+                                      </td>
+                                      <td className="px-2 py-3 text-xs text-center text-gray-600">{formatDate(invoice.date)}</td>
+                                      <td className="px-2 py-3 text-sm text-center">
+                                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${getInvoiceStatusColor(invoice.status)}`}>
+                                          {invoice.status}
+                                        </span>
+                                      </td>
+                                      <td className="px-2 py-3 text-sm text-center">
+                                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${getPaymentStatusColor(invoice.payment_status)}`}>
+                                          {invoice.payment_status}
+                                        </span>
+                                      </td>
+                                      <td className="px-2 py-3 text-xs text-center text-gray-600">{invoice.products.length}</td>
+                                      <td className="px-2 py-3 text-xs text-center text-gray-700">{formatCurrency(invoice.buying_price)}</td>
+                                      <td className="px-2 py-3 text-xs text-center text-gray-900 font-medium">{formatCurrency(invoice.amount)}</td>
+                                      <td className="px-2 py-3 text-xs text-center text-gray-900 font-medium">{formatCurrency(invoice.amount_paid || '0')}</td>
+                                      <td className="px-2 py-3 text-xs text-center text-gray-900">{formatCurrency(invoice.cgst)}</td>
+                                      <td className="px-2 py-3 text-xs text-center text-gray-900">{formatCurrency(invoice.sgst)}</td>
+                                      <td className="px-2 py-3 text-xs text-center text-gray-900">{formatCurrency(invoice.igst)}</td>
+                                      <td className="px-2 py-3 text-xs text-center text-gray-900 font-medium">{formatCurrency(invoice.net_amount)}</td>
+                                      <td className="px-2 py-3 text-xs text-center text-gray-700">{formatCurrency(invoice.itc)}</td>
+                                      <td className="px-2 py-3 text-xs text-center text-gray-600">{invoice.state}</td>
+                                    </tr>
+                                    {isInvoiceExpanded && (
+                                      <tr>
+                                        <td colSpan={14} className="px-4 py-0">
+                                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-2">
+                                            <div className="flex items-center space-x-2 mb-3">
+                                              <Package className="h-5 w-5 text-blue-600" />
+                                              <h5 className="text-sm font-semibold text-blue-800">Product Details</h5>
+                                            </div>
+                                            <div className="overflow-x-auto">
+                                              <table className="w-full divide-y divide-blue-200" style={{ minWidth: '1200px' }}>
+                                                <thead className="bg-blue-100">
+                                                  <tr>
+                                                    <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '80px' }}>SKU</th>
+                                                    <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '120px' }}>Product Name</th>
+                                                    <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '100px' }}>Category</th>
+                                                    <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '90px' }}>Buying Price</th>
+                                                    <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '90px' }}>Unit Price</th>
+                                                    <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '70px' }}>Quantity</th>
+                                                    <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '80px' }}>Discount %</th>
+                                                    <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '110px' }}>Price After Discount</th>
+                                                    <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '80px' }}>CGST</th>
+                                                    <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '80px' }}>SGST</th>
+                                                    <th className="px-2 py-2 text-center text-xs font-medium text-blue-700 uppercase" style={{ width: '80px' }}>IGST</th>
+                                                  </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-blue-200">
+                                                  {invoice.products.map((product, productIndex) => (
+                                                    <tr key={productIndex} className="bg-white">
+                                                      <td className="px-2 py-2 text-center text-xs font-medium text-gray-900">{product.sku}</td>
+                                                      <td className="px-2 py-2 text-center text-xs text-gray-900">{product.product_name}</td>
+                                                      <td className="px-2 py-2 text-center text-xs text-gray-600">
+                                                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                          {product.category}
+                                                        </span>
+                                                      </td>
+                                                      <td className="px-2 py-2 text-center text-xs text-gray-700">{formatCurrency(product.buying_price)}</td>
+                                                      <td className="px-2 py-2 text-center text-xs text-gray-900">{formatCurrency(product.unit_price)}</td>
+                                                      <td className="px-2 py-2 text-center text-xs text-gray-900 font-medium">{product.quantity}</td>
+                                                      <td className="px-2 py-2 text-center text-xs text-gray-900">{product.discount_percent}%</td>
+                                                      <td className="px-2 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.price_after_discount)}</td>
+                                                      <td className="px-2 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.cgst)}</td>
+                                                      <td className="px-2 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.sgst)}</td>
+                                                      <td className="px-2 py-2 text-center text-xs text-gray-900 font-medium">{formatCurrency(product.igst)}</td>
+                                                    </tr>
+                                                  ))}
+                                                </tbody>
+                                              </table>
+                                            </div>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </React.Fragment>
+                                );
+                              })}
+                              {(() => {
+                                const totals = calculateInvoiceTotals(filing.invoices);
+                                return (
+                                  <tr className="bg-blue-100 font-semibold text-gray-800">
+                                    <td className="px-2 py-3 text-xs text-center" colSpan={4}>Total</td>
+                                    <td className="px-2 py-3 text-xs text-center">{totals.productcount}</td>
+                                    <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.buying_price.toFixed(2))}</td>
+                                    <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.amount.toFixed(2))}</td>
+                                    <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.amount_paid.toFixed(2))}</td>
+                                    <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.cgst.toFixed(2))}</td>
+                                    <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.sgst.toFixed(2))}</td>
+                                    <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.igst.toFixed(2))}</td>
+                                    <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.net_amount.toFixed(2))}</td>
+                                    <td className="px-2 py-3 text-xs text-center">{formatCurrency(totals.itc.toFixed(2))}</td>
+                                    <td className="px-2 py-3 text-xs text-center">--</td>
+                                  </tr>
+                                );
+                              })()}
                             </tbody>
                           </table>
                         </div>
