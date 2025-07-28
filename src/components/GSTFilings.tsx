@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Filing, Invoice } from '../services/api';
 import { apiService } from '../services/api';
+import { FileText, Calendar, IndianRupee, AlertTriangle, ChevronDown, ChevronRight, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 
 const GSTFilings: React.FC = () => {
   const { gstin } = useParams<{ gstin: string }>();
+  const navigate = useNavigate();
   const [filings, setFilings] = useState<Filing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedFiling, setExpandedFiling] = useState<string | null>(null);
+  const [vendorName, setVendorName] = useState<string>('');
 
   useEffect(() => {
     const fetchFilings = async () => {
@@ -16,6 +19,9 @@ const GSTFilings: React.FC = () => {
         setLoading(true);
         const response = await apiService.getFilingsByGstin(gstin!);
         setFilings(response);
+        if (response.length > 0) {
+          setVendorName(response[0].vendor_name);
+        }
       } catch (err) {
         setError('Failed to fetch filings');
         console.error('Error fetching filings:', err);
@@ -29,230 +35,266 @@ const GSTFilings: React.FC = () => {
     }
   }, [gstin]);
 
-  const formatCurrency = (amount: string | number | null | undefined): string => {
-    if (!amount || amount === '' || amount === 'null' || amount === 'undefined') {
-      return '₹0.00';
-    }
-    
-    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-    if (isNaN(numAmount)) {
-      return '₹0.00';
-    }
-    
-    return `₹${numAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formatCurrency = (amount: string) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+    }).format(parseFloat(amount));
   };
 
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('en-IN');
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
   };
 
-  const getStatusBadge = (status: string) => {
-    const statusLower = status?.toLowerCase() || '';
-    let bgColor = 'bg-gray-100 text-gray-800';
-    
-    if (['completed', 'processed'].includes(statusLower)) {
-      bgColor = 'bg-green-100 text-green-800';
-    } else if (statusLower === 'pending') {
-      bgColor = 'bg-yellow-100 text-yellow-800';
-    } else if (['cancelled', 'rejected'].includes(statusLower)) {
-      bgColor = 'bg-red-100 text-red-800';
-    } else if (statusLower === 'draft') {
-      bgColor = 'bg-gray-100 text-gray-800';
-    } else {
-      bgColor = 'bg-blue-100 text-blue-800';
+  const formatDateTime = (dateString: string) => {
+    return new Date(dateString).toLocaleString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'filed':
+        return 'bg-green-100 text-green-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'overdue':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
-    
-    return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${bgColor}`}>
-        {status}
-      </span>
-    );
   };
 
-  const getPaymentStatusBadge = (paymentStatus: string) => {
-    const statusLower = paymentStatus?.toLowerCase() || '';
-    let bgColor = 'bg-gray-100 text-gray-800';
-    
-    if (['paid', 'completed'].includes(statusLower)) {
-      bgColor = 'bg-green-100 text-green-800';
-    } else if (['pending', 'processing'].includes(statusLower)) {
-      bgColor = 'bg-yellow-100 text-yellow-800';
-    } else if (['failed', 'cancelled'].includes(statusLower)) {
-      bgColor = 'bg-red-100 text-red-800';
-    } else if (statusLower === 'partial') {
-      bgColor = 'bg-orange-100 text-orange-800';
-    }
-    
-    return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${bgColor}`}>
-        {paymentStatus}
-      </span>
-    );
-  };
-
-  const calculateTotals = (invoices: Invoice[]) => {
-    return invoices.reduce((totals, invoice) => ({
-      totalAmount: totals.totalAmount + parseFloat(invoice.total_amount || '0'),
-      totalTax: totals.totalTax + parseFloat(invoice.total_tax || '0'),
-      totalAmountPaid: totals.totalAmountPaid + parseFloat(invoice.amount_paid || '0'),
-    }), { totalAmount: 0, totalTax: 0, totalAmountPaid: 0 });
+  const toggleExpanded = (filingId: string) => {
+    setExpandedFiling(expandedFiling === filingId ? null : filingId);
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="flex items-center justify-center py-12">
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          <p className="text-gray-600">Loading GST filings...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <div className="text-red-600 mb-4">{error}</div>
-        <button
-          onClick={() => window.location.reload()}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
-        >
-          Retry
-        </button>
+      <div className="flex items-center justify-center py-12">
+        <div className="flex flex-col items-center space-y-4 text-center">
+          <AlertCircle className="h-12 w-12 text-red-500" />
+          <p className="text-red-700 font-medium">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }
 
   if (filings.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">No filings found for this vendor.</p>
+      <div className="flex items-center justify-center py-12">
+        <div className="flex flex-col items-center space-y-4 text-center">
+          <FileText className="h-12 w-12 text-gray-400" />
+          <div>
+            <h3 className="text-lg font-medium text-gray-900">No filings found</h3>
+            <p className="text-gray-600">No GST filings found for this vendor</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900">GST Filings</h2>
-      
-      {filings.map((filing) => {
-        const totals = calculateTotals(filing.invoices);
-        const isExpanded = expandedFiling === filing.filing_id;
-        
-        return (
-          <div key={filing.filing_id} className="bg-white shadow rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900">
-                    Filing ID: {filing.filing_id}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    Period: {filing.filing_period} | Due: {formatDate(filing.due_date)}
-                  </p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">
-                      {filing.invoices.length} Invoice{filing.invoices.length !== 1 ? 's' : ''}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Total: {formatCurrency(totals.totalAmount)}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setExpandedFiling(isExpanded ? null : filing.filing_id)}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
-                  >
-                    {isExpanded ? 'Hide' : 'View'} Invoices
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {isExpanded && (
-              <div className="px-6 py-4">
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Invoice ID
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Payment Status
-                        </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Amount
-                        </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Tax
-                        </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Amount Paid
-                        </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Total
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {filing.invoices.map((invoice) => (
-                        <tr key={invoice.invoice_id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {invoice.invoice_id}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {formatDate(invoice.invoice_date)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {getStatusBadge(invoice.status)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {getPaymentStatusBadge(invoice.payment_status)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                            {formatCurrency(invoice.amount)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                            {formatCurrency(invoice.total_tax)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                            {formatCurrency(invoice.amount_paid)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
-                            {formatCurrency(invoice.total_amount)}
-                          </td>
-                        </tr>
-                      ))}
-                      <tr className="bg-gray-50 font-medium">
-                        <td colSpan={4} className="px-6 py-4 text-sm text-gray-900">
-                          Total ({filing.invoices.length} invoices)
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                          {formatCurrency(totals.totalAmount - totals.totalTax)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                          {formatCurrency(totals.totalTax)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                          {formatCurrency(totals.totalAmountPaid)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
-                          {formatCurrency(totals.totalAmount)}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={() => navigate('/all-filings')}
+            className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5 text-gray-600" />
+          </button>
+          <FileText className="h-8 w-8 text-blue-600" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">GST Filings</h1>
+            <p className="text-gray-600">GSTIN: {gstin}</p>
           </div>
-        );
-      })}
+        </div>
+        <div className="bg-blue-50 px-4 py-2 rounded-lg">
+          <span className="text-blue-700 font-medium">{filings.length} Filings</span>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {filings.map((filing, index) => {
+          const filingId = `${filing.gstin}-${index}`;
+          const isExpanded = expandedFiling === filingId;
+          
+          return (
+            <div key={filingId} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div
+                className="p-6 cursor-pointer hover:bg-gray-50 transition-colors"
+                onClick={() => toggleExpanded(filingId)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    {isExpanded ? (
+                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                    ) : (
+                      <ChevronRight className="h-5 w-5 text-gray-400" />
+                    )}
+                    <div>
+                      <div className="flex items-center space-x-3">
+                        <h3 className="text-lg font-semibold text-gray-900 capitalize">
+                          {filing.timeframe} Filing
+                        </h3>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(filing.status)}`}>
+                          {filing.status}
+                        </span>
+                        {filing.is_late && (
+                          <span className="inline-flex items-center space-x-1 text-red-600">
+                            <AlertTriangle className="h-4 w-4" />
+                            <span className="text-xs font-medium">Late</span>
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
+                        <div className="flex items-center space-x-1">
+                          <Calendar className="h-4 w-4" />
+                          <span>{formatDate(filing.filing_start_date)} - {formatDate(filing.filing_end_date)}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <IndianRupee className="h-4 w-4" />
+                          <span>{formatCurrency(filing.total_amount)}</span>
+                        </div>
+                        {filing.filed_at && (
+                          <div className="flex items-center space-x-1">
+                            <span className="text-xs">Filed: {formatDateTime(filing.filed_at)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium text-gray-900">{filing.invoice_count} Invoices</div>
+                    <div className="text-sm text-gray-600">Due: {formatDate(filing.due_date)}</div>
+                  </div>
+                </div>
+              </div>
+
+              {isExpanded && (
+                <div className="border-t border-gray-200 bg-gray-50">
+                  <div className="p-6 space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <div className="text-sm text-gray-500">Total Tax</div>
+                        <div className="text-lg font-semibold text-gray-900">{formatCurrency(filing.total_tax)}</div>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <div className="text-sm text-gray-500">Input Tax Credit</div>
+                        <div className="text-lg font-semibold text-green-700">{formatCurrency(filing.input_tax_credit)}</div>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <div className="text-sm text-gray-500">Tax Payable</div>
+                        <div className="text-lg font-semibold text-orange-700">{formatCurrency(filing.tax_payable)}</div>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <div className="text-sm text-gray-500">Penalty</div>
+                        <div className="text-lg font-semibold text-red-700">{formatCurrency(filing.penalty)}</div>
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <IndianRupee className="h-5 w-5 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-800">Total Payable Amount</span>
+                      </div>
+                      <div className="text-2xl font-bold text-blue-900">{formatCurrency(filing.total_payable_amount)}</div>
+                    </div>
+
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Invoice Details</h4>
+                      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                        <div className="overflow-x-auto">
+                          <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                              <tr>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Invoice ID
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Date
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  Amount
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  CGST
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  SGST
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  IGST
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  State
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                              {filing.invoices.map((invoice) => (
+                                <tr key={invoice.invoice_id} className="hover:bg-gray-50">
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {invoice.invoice_id}
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {formatDate(invoice.date)}
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {formatCurrency(invoice.amount)}
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {formatCurrency(invoice.cgst)}
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {formatCurrency(invoice.sgst)}
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {formatCurrency(invoice.igst)}
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                    {invoice.state}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

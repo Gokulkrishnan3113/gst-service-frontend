@@ -1,8 +1,7 @@
-// const API_BASE_URL = 'http://localhost:8080';
-const API_BASE_URL = 'https://gst-service-g776.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://gst-service-g776.onrender.com';
 
 // Default API key for vendors and GST filings
-const DEFAULT_API_KEY = 'm8ak3bv7cn2dq9er4fw6gz1hs5jx0ka7c3lf9mj2pl6qy8rt4su1vb5wd0xh3yg7';
+const DEFAULT_API_KEY = import.meta.env.VITE_DEFAULT_API_KEY || 'm8ak3bv7cn2dq9er4fw6gz1hs5jx0ka7c3lf9mj2pl6qy8rt4su1vb5wd0xh3yg7';
 
 export interface Vendor {
   gstin: string;

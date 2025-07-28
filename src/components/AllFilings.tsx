@@ -280,11 +280,11 @@ const AllFilings: React.FC = () => {
                         </div>
                         <Link
                           to={`/gst-filings/${filing.gstin}`}
-                          className="group flex items-center space-x-2 text-blue-600 hover:font-bold font-medium transition-colors"
+                          className="group flex items-center space-x-2 text-blue-600 hover:text-blue-800 font-medium transition-colors"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <span>{filing.gstin}</span>
-                          <ExternalLink className="h-4 w-4 group-hover:stroke-[3.0] transition-all" />
+                          <ExternalLink className="h-4 w-4" />
                         </Link>
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(filing.status)}`}>
                           {filing.status}
