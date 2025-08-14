@@ -231,7 +231,7 @@ const VendorDetails: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Vendor Financial Details</h1>
           <p className="text-gray-600">
-            {vendor?.name} - GSTIN: {gstin} - MAC: {vendor?.mac_list?.[0] || 'N/A'}
+            {vendor?.name} - GSTIN: {gstin}
           </p>
         </div>
       </div>
