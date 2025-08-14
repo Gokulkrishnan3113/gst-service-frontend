@@ -18,14 +18,18 @@ const VendorDetails: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!gstin || !vendor?.api_key) {
-        setError('Missing vendor information or API key');
+      if (!gstin || !vendor?.api_key || !vendor?.mac_list || vendor.mac_list.length === 0) {
+        setError('Missing vendor information, API key, or MAC address');
         setLoading(false);
         return;
       }
 
       console.log('Fetching data for GSTIN:', gstin);
       console.log('Using API key:', vendor.api_key);
+      
+      // Use the first MAC address from the mac_list
+      const macAddress = vendor.mac_list[0];
+      console.log('Using MAC address:', macAddress);
       
       try {
         setLoading(true);
@@ -41,7 +45,7 @@ const VendorDetails: React.FC = () => {
         
         try {
           console.log('Fetching balance...');
-          balanceData = await apiService.getBalance(gstin, vendor.api_key);
+          balanceData = await apiService.getBalance(gstin, vendor.api_key, macAddress);
           console.log('Balance response:', balanceData);
         } catch (balanceError) {
           console.error('Balance API error:', balanceError);
@@ -49,7 +53,7 @@ const VendorDetails: React.FC = () => {
         
         try {
           console.log('Fetching ledger...');
-          ledgerData = await apiService.getLedger(gstin, vendor.api_key);
+          ledgerData = await apiService.getLedger(gstin, vendor.api_key, macAddress);
           console.log('Ledger response:', ledgerData);
         } catch (ledgerError) {
           console.error('Ledger API error:', ledgerError);
@@ -57,7 +61,7 @@ const VendorDetails: React.FC = () => {
         
         try {
           console.log('Fetching credit notes...');
-          creditNotesData = await apiService.getCreditNotes(gstin, vendor.api_key);
+          creditNotesData = await apiService.getCreditNotes(gstin, vendor.api_key, macAddress);
           console.log('Credit notes response:', creditNotesData);
         } catch (creditError) {
           console.error('Credit notes API error:', creditError);
@@ -227,7 +231,7 @@ const VendorDetails: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Vendor Financial Details</h1>
           <p className="text-gray-600">
-            {vendor?.name} - GSTIN: {gstin}
+            {vendor?.name} - GSTIN: {gstin} - MAC: {vendor?.mac_list?.[0] || 'N/A'}
           </p>
         </div>
       </div>

@@ -14,6 +14,7 @@ export interface Vendor {
   email: string;
   api_key: string;
   secret_key: string;
+  mac_list: string[];
 }
 
 export interface Product {
@@ -165,12 +166,38 @@ export const apiService = {
     return result.data;
   },
 
-  async getBalance(gstin: string, apiKey: string): Promise<Balance> {
+  async getLedger(gstin: string, apiKey: string, macAddress?: string): Promise<LedgerEntry[]> {
+    const headers: Record<string, string> = {
+      'Authorization': apiKey,
+      'Content-Type': 'application/json',
+    };
+    
+    if (macAddress) {
+      headers['mac-address'] = macAddress;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/ledger/${gstin}`, {
+      headers,
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch ledger');
+    }
+    const result: ApiResponse<LedgerEntry[]> = await response.json();
+    return result.data;
+  },
+
+  async getBalance(gstin: string, apiKey: string, macAddress?: string): Promise<Balance> {
+    const headers: Record<string, string> = {
+      'Authorization': apiKey,
+      'Content-Type': 'application/json',
+    };
+    
+    if (macAddress) {
+      headers['mac-address'] = macAddress;
+    }
+
     const response = await fetch(`${API_BASE_URL}/ledger/balance/${gstin}`, {
-      headers: {
-        'Authorization': apiKey,
-        'Content-Type': 'application/json',
-      },
+      headers,
     });
     if (!response.ok) {
       throw new Error(`Failed to fetch balance: ${response.status}`);
@@ -180,12 +207,18 @@ export const apiService = {
     return result.data;
   },
 
-  async getCreditNotes(gstin: string, apiKey: string): Promise<CreditNote[]> {
+  async getCreditNotes(gstin: string, apiKey: string, macAddress?: string): Promise<CreditNote[]> {
+    const headers: Record<string, string> = {
+      'Authorization': apiKey,
+      'Content-Type': 'application/json',
+    };
+    
+    if (macAddress) {
+      headers['mac-address'] = macAddress;
+    }
+
     const response = await fetch(`${API_BASE_URL}/ledger/credit-notes/${gstin}`, {
-      headers: {
-        'Authorization': apiKey,
-        'Content-Type': 'application/json',
-      },
+      headers,
     });
     if (!response.ok) {
       throw new Error(`Failed to fetch credit notes: ${response.status}`);
