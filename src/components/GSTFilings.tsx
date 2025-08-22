@@ -12,6 +12,7 @@ const GSTFilings: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [expandedFiling, setExpandedFiling] = useState<string | null>(null);
   const [expandedInvoices, setExpandedInvoices] = useState<Set<string>>(new Set());
   const [vendorName, setVendorName] = useState<string>('');
@@ -22,8 +23,10 @@ const GSTFilings: React.FC = () => {
         setLoading(true);
         const response = await apiService.getFilingsByGstin(gstin!, page);
         setFilings(response.data);
-        setTotalPages(response.totalPages);
-        setCurrentPage(response.currentPage);
+        setTotalCount(response.total_count || 0);
+        // Calculate total pages based on response data
+        const pageSize = response.data.length || 1;
+        setTotalPages(Math.ceil((response.total_count || 0) / pageSize));
         if (response.data.length > 0) {
           setVendorName(response.data[0].vendor_name);
         }
@@ -231,7 +234,7 @@ const GSTFilings: React.FC = () => {
           </div>
         </div>
         <div className="bg-blue-50 px-4 py-2 rounded-lg">
-          <span className="text-blue-700 font-medium">{filings.length} Filings</span>
+          <span className="text-blue-700 font-medium">{totalCount} Total Filings</span>
         </div>
       </div>
 

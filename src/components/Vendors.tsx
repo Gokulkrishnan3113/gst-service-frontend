@@ -9,6 +9,7 @@ const Vendors: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     const fetchVendors = async (page: number) => {
@@ -16,8 +17,10 @@ const Vendors: React.FC = () => {
         setLoading(true);
         const response = await apiService.getVendors(page);
         setVendors(response.data);
-        setTotalPages(response.totalPages);
-        setCurrentPage(response.currentPage);
+        setTotalCount(response.total_count || 0);
+        // Calculate total pages: total_count / vendors_count (page size)
+        const pageSize = response.vendors_count || response.data.length || 1;
+        setTotalPages(Math.ceil((response.total_count || 0) / pageSize));
       } catch (err) {
         setError('Failed to fetch vendors. Please try again.');
         console.error('Error fetching vendors:', err);
@@ -87,7 +90,7 @@ const Vendors: React.FC = () => {
           </div>
         </div>
         <div className="bg-blue-50 px-4 py-2 rounded-lg">
-          <span className="text-blue-700 font-medium">{vendors.length} Vendors</span>
+          <span className="text-blue-700 font-medium">{totalCount} Total Vendors</span>
         </div>
       </div>
 
