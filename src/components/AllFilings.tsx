@@ -215,36 +215,31 @@ const AllFilings: React.FC = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="flex flex-col items-center space-y-4 text-center">
-          <AlertCircle className="h-12 w-12 text-red-500" />
-          <p className="text-red-700 font-medium">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // if (error || filings.length === 0) {
+  //   return (
+  //     <div className="flex items-center justify-center py-12">
+  //       <div className="flex flex-col items-center space-y-4 text-center">
+  //         <FileText className="h-12 w-12 text-red-500" />
+  //         <p className="text-gray-600">No GST filings exist in the system</p>
 
-  if (filings.length === 0) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="flex flex-col items-center space-y-4 text-center">
-          <FileText className="h-12 w-12 text-gray-400" />
-          <div>
-            <h3 className="text-lg font-medium text-gray-900">No filings found</h3>
-            <p className="text-gray-600">No GST filings exist in the system</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
+  // if (filings.length === 0) {
+  //   return (
+  //     <div className="flex items-center justify-center py-12">
+  //       <div className="flex flex-col items-center space-y-4 text-center">
+  //         <FileText className="h-12 w-12 text-gray-400" />
+  //         <div>
+  //           <h3 className="text-lg font-medium text-gray-900">No filings found</h3>
+  //           <p className="text-gray-600">No GST filings exist in the system</p>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="space-y-6">
@@ -617,6 +612,12 @@ const AllFilings: React.FC = () => {
               </nav>
             </div>
           </div>
+        </div>
+      )}
+      {filings.length === 0 && (
+        <div className="text-center py-8">
+          <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-500">No filings found matching your search.</p>
         </div>
       )}
     </div>
