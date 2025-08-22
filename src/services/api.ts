@@ -107,11 +107,12 @@ export interface ApiResponse<T> {
   success: boolean;
   data: T;
   vendors_count?: number;
+  total_count?: number;
 }
 
 export const apiService = {
-  async getVendors(): Promise<Vendor[]> {
-    const response = await fetch(`${API_BASE_URL}/vendors`, {
+  async getVendors(page: number = 1): Promise<ApiResponse<Vendor[]>> {
+    const response = await fetch(`${API_BASE_URL}/vendors?page=${page}`, {
       headers: {
         'Authorization': DEFAULT_API_KEY,
         'Content-Type': 'application/json',
@@ -120,12 +121,11 @@ export const apiService = {
     if (!response.ok) {
       throw new Error(`Failed to fetch vendors: ${response.status} ${response.statusText}`);
     }
-    const result: ApiResponse<Vendor[]> = await response.json();
-    return result.data;
+    return await response.json();
   },
 
-  async getFilingsByGstin(gstin: string): Promise<Filing[]> {
-    const response = await fetch(`${API_BASE_URL}/gst/filings-with-invoices/${gstin}`, {
+  async getFilingsByGstin(gstin: string, page: number = 1): Promise<ApiResponse<Filing[]>> {
+    const response = await fetch(`${API_BASE_URL}/gst/filings-with-invoices/${gstin}?page=${page}`, {
       headers: {
         'Authorization': DEFAULT_API_KEY,
         'Content-Type': 'application/json',
@@ -134,12 +134,11 @@ export const apiService = {
     if (!response.ok) {
       throw new Error('Failed to fetch filings');
     }
-    const result: ApiResponse<Filing[]> = await response.json();
-    return result.data;
+    return await response.json();
   },
 
-  async getAllFilings(): Promise<Filing[]> {
-    const response = await fetch(`${API_BASE_URL}/gst/filings-with-invoices`, {
+  async getAllFilings(page: number = 1): Promise<ApiResponse<Filing[]>> {
+    const response = await fetch(`${API_BASE_URL}/gst/filings-with-invoices?page=${page}`, {
       headers: {
         'Authorization': DEFAULT_API_KEY,
         'Content-Type': 'application/json',
@@ -148,8 +147,7 @@ export const apiService = {
     if (!response.ok) {
       throw new Error(`Failed to fetch all filings: ${response.status}`);
     }
-    const result: ApiResponse<Filing[]> = await response.json();
-    return result.data;
+    return await response.json();
   },
 
   async getLedger(gstin: string, apiKey: string): Promise<LedgerEntry[]> {
