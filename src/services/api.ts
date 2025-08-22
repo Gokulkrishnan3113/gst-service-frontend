@@ -107,11 +107,14 @@ export interface ApiResponse<T> {
   success: boolean;
   data: T;
   vendors_count?: number;
+  total_pages?: number;
+  current_page?: number;
+  total_count?: number;
 }
 
 export const apiService = {
-  async getVendors(): Promise<Vendor[]> {
-    const response = await fetch(`${API_BASE_URL}/vendors`, {
+  async getVendors(page: number = 1): Promise<{ data: Vendor[]; totalPages: number; currentPage: number }> {
+    const response = await fetch(`${API_BASE_URL}/vendors?page=${page}`, {
       headers: {
         'Authorization': DEFAULT_API_KEY,
         'Content-Type': 'application/json',
@@ -121,11 +124,15 @@ export const apiService = {
       throw new Error(`Failed to fetch vendors: ${response.status} ${response.statusText}`);
     }
     const result: ApiResponse<Vendor[]> = await response.json();
-    return result.data;
+    return {
+      data: result.data,
+      totalPages: result.total_pages || 1,
+      currentPage: result.current_page || 1,
+    };
   },
 
-  async getFilingsByGstin(gstin: string): Promise<Filing[]> {
-    const response = await fetch(`${API_BASE_URL}/gst/filings-with-invoices/${gstin}`, {
+  async getFilingsByGstin(gstin: string, page: number = 1): Promise<{ data: Filing[]; totalPages: number; currentPage: number }> {
+    const response = await fetch(`${API_BASE_URL}/gst/filings-with-invoices/${gstin}?page=${page}`, {
       headers: {
         'Authorization': DEFAULT_API_KEY,
         'Content-Type': 'application/json',
@@ -135,11 +142,15 @@ export const apiService = {
       throw new Error('Failed to fetch filings');
     }
     const result: ApiResponse<Filing[]> = await response.json();
-    return result.data;
+    return {
+      data: result.data,
+      totalPages: result.total_pages || 1,
+      currentPage: result.current_page || 1,
+    };
   },
 
-  async getAllFilings(): Promise<Filing[]> {
-    const response = await fetch(`${API_BASE_URL}/gst/filings-with-invoices`, {
+  async getAllFilings(page: number = 1): Promise<{ data: Filing[]; totalPages: number; currentPage: number }> {
+    const response = await fetch(`${API_BASE_URL}/gst/filings-with-invoices?page=${page}`, {
       headers: {
         'Authorization': DEFAULT_API_KEY,
         'Content-Type': 'application/json',
@@ -149,7 +160,11 @@ export const apiService = {
       throw new Error(`Failed to fetch all filings: ${response.status}`);
     }
     const result: ApiResponse<Filing[]> = await response.json();
-    return result.data;
+    return {
+      data: result.data,
+      totalPages: result.total_pages || 1,
+      currentPage: result.current_page || 1,
+    };
   },
 
   async getLedger(gstin: string, apiKey: string): Promise<LedgerEntry[]> {
